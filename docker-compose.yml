@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  xqa-db:
+    image: jameshnsears/xqa-db
+    volumes:
+      - "xqa-db:/var/lib/postgresql"
+    ports:
+      - "5432:5432"
+    networks:
+      - xqa
+
+  xqa-db-rest:
+    build: .
+    image: "xqa-db-rest"
+    command: ["-storage_host", "xqa-db"]
+    image: "xqa-db-rest"
+    depends_on:
+      - xqa-db
+    networks:
+      - xqa
+
+volumes:
+  xqa-db:
+
+networks:
+  xqa:

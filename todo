@@ -1,0 +1,61 @@
+talk directly to postgresql
+
+put version id in urls
+
+--
+
+use http://square.github.io/okhttp/ for integration test for health?
++
+use in combination with gson?
+
+--
+
+create a python test with requests - that's incorporated with travis
+
+--
+
+create domain objects in "core" package for the amqp message handling - which are request/response messages
+
+--
+
+
+use optional in api
+
+--
+
+have a /tasks/my_task to gracefully shutdown the app
+
+https://stackoverflow.com/questions/31288721/dropwizard-shutdown-hook
+http://www.dropwizard.io/1.2.2/docs/manual/core.html#tasks
+
+--
+
+have a proper health check - tests that amqp server reachable?
+= TemplateHealthCheck
+
+--
+
+Metrics
+
+Every resource method can be annotated with @Timed, @Metered, and @ExceptionMetered. Dropwizard augments Jersey to automatically record runtime information about your resource methods.
+
+    @Timed measures the duration of requests to a resource
+    @Metered measures the rate at which the resource is accessed
+    @ExceptionMetered measures how often exceptions occur processing the resource
+
+--
+
+api: Representations. Request and response bodies.
+= json pojo request / reponse
+
+core:
+= domain objects, not used by api
+
+resources: Resources
+= manages api
+
+--
+
+http://joel-costigliola.github.io/assertj/index.html
+
+http://www.studytrails.com/java/json/java-google-json-introduction/

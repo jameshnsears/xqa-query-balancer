@@ -1,0 +1,14 @@
+logging:
+  level: INFO
+  loggers:
+    org.apache.qpid.jms: WARN
+    xqa: DEBUG
+  appenders:
+    - type: console
+    - type: file
+      currentLogFilename: './logs/application.log'
+      archivedLogFilenamePattern: './logs/application-%d-%i.log.gz'
+      archive: true
+      archivedFileCount: 7
+      maxFileSize: '1mb'
+

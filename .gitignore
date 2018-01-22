@@ -1,0 +1,7 @@
+.checkstyle
+dependency-reduced-pom.xml
+.idea
+logs
+tags
+/target/
+xqa-db-rest.iml
