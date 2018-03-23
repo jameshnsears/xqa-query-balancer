@@ -20,8 +20,14 @@ public class XQueryTest {
     @Test
     public void xquery() {
         final XQueryResponse xqueryResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/xquery").request(MediaType.APPLICATION_JSON_TYPE)
+                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/xquery?xquery=count(/)").request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.json(new XQueryRequest("count(/)"))).readEntity(XQueryResponse.class);
+
+        /*
+{
+    "xqueryResponse": "<some xquery response/>"
+}
+         */
 
         assertThat(xqueryResponse.xqueryRespone).isEqualTo("<a>b</a>");
     }

@@ -19,9 +19,19 @@ public class SearchTest {
     @Test
     public void correlationId() {
         final SearchResponse correlationIdSearchResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/correlationId/1").request()
+                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search?searchValue=123").request()
                 .get(SearchResponse.class);
 
+        /*
+[
+        {
+            "creationTime": "2018-03-16 17:52:23.259682",
+            "service": "ingest/02bd02c2",
+            "subject": "DBER-1923-0416.xml",
+            "digest": "aa84010b"
+        }
+]
+         */
         assertThat(correlationIdSearchResponse.getSearchResponse().get(0).toString())
                 .isEqualTo("SearchResult{time=time, correlationId=1, subject=N/A, service=N/A, digest=N/A}");
     }
@@ -32,37 +42,5 @@ public class SearchTest {
             RULE.client().target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/correlationId/2").request()
                     .get(SearchResponse.class);
         }).withMessage("HTTP 400 Bad Request");
-    }
-
-    @Test
-    public void digest() {
-        final SearchResponse digestResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/digest/1").request()
-                .get(SearchResponse.class);
-
-        assertThat(digestResponse.getSearchResponse().get(0).toString())
-                .isEqualTo("SearchResult{time=time, correlationId=N/A, subject=N/A, service=N/A, digest=1}");
-    }
-
-    @Test
-    public void service() {
-        final SearchResponse serviceResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/service/1").request()
-                .get(SearchResponse.class);
-
-        assertThat(serviceResponse.getSearchResponse().get(0).toString())
-                .isEqualTo("SearchResult{time=time, correlationId=N/A, subject=N/A, service=1, digest=N/A}");
-
-    }
-
-    @Test
-    public void subject() {
-        final SearchResponse subjectResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/subject/1").request()
-                .get(SearchResponse.class);
-
-        assertThat(subjectResponse.getSearchResponse().get(0).toString())
-                .isEqualTo("SearchResult{time=time, correlationId=N/A, subject=1, service=N/A, digest=N/A}");
-
     }
 }
