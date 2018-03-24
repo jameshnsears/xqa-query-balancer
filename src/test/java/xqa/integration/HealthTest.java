@@ -6,11 +6,11 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import xqa.XqaRestConfiguration;
+import xqa.XqaDbRestConfiguration;
 
 public class HealthTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
 
     @Test
     public void health() {

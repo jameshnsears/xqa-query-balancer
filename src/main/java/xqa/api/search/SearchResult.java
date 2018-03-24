@@ -4,31 +4,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 public class SearchResult {
-    private String time;
-    private String correlationId;
-    private String subject;
+    private String creationTime;
     private String service;
+    private String subject;
     private String digest;
 
     public SearchResult() {
     }
 
-    public SearchResult(String time, String correlationId, String subject, String service, String digest) {
-        this.time = time;
-        this.correlationId = correlationId;
-        this.subject = subject;
+    public SearchResult(String creationTime, String service, String subject, String digest) {
+        this.creationTime = creationTime;
         this.service = service;
+        this.subject = subject;
         this.digest = digest;
     }
 
     @JsonProperty
-    public String getTime() {
-        return time;
-    }
-
-    @JsonProperty
-    public String getCorrelationId() {
-        return correlationId;
+    public String getCreationTime() {
+        return creationTime;
     }
 
     @JsonProperty
@@ -48,7 +41,6 @@ public class SearchResult {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("time", time).add("correlationId", correlationId)
-                .add("subject", subject).add("service", service).add("digest", digest).toString();
+        return MoreObjects.toStringHelper(this).add("creationTime", creationTime).add("service", service).add("subject", subject).add("digest", digest).toString();
     }
 }

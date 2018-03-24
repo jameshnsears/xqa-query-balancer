@@ -10,6 +10,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,51 +23,25 @@ import xqa.api.search.SearchResult;
 @Produces(MediaType.APPLICATION_JSON)
 public class SearchResource {
     private static final Logger logger = LoggerFactory.getLogger(SearchResource.class);
+    private Jdbi jdbi;
 
-    private SearchResponse search(final Optional<String> correlationId, final Optional<String> subject,
-            final Optional<String> service, final Optional<String> digest) {
+    public SearchResource(Jdbi jdbi) {
+        this.jdbi = jdbi;
+    }
 
-        logger.debug("correlationId={}", correlationId.orElse("N/A"));
-        logger.debug("service={}", service.orElse("N/A"));
-        logger.debug("subject={}", subject.orElse("N/A"));
-        logger.debug("digest={}", digest.orElse("N/A"));
+    @GET
+    @Timed
+    @Path("/{searchString}")
+    public SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
+        logger.debug("searchString={}", searchString.orElse("*"));
 
-        if (correlationId.toString().equals("Optional[2]"))
-            throw new WebApplicationException(String.format("correlationId"), Response.Status.BAD_REQUEST);
+        if (searchString.toString().equals("Optional[x]"))
+            throw new WebApplicationException(String.format("x"), Response.Status.BAD_REQUEST);
 
         SearchResponse searchResponse = new SearchResponse();
-        SearchResult searchResult = new SearchResult("time", correlationId.orElse("N/A"), subject.orElse("N/A"),
-                service.orElse("N/A"), digest.orElse("N/A"));
-        searchResponse.getSearchResponse().add(searchResult);
+
+        searchResponse.getSearchResponse().add(new SearchResult("2018-03-16 17:52:23.259682", "ingest/02bd02c2", "DBER-1923-0416.xml", "aa84010b"));
 
         return searchResponse;
-    }
-
-    @GET
-    @Timed
-    @Path("/correlationId/{correlationId}")
-    public SearchResponse correlationId(@PathParam("correlationId") Optional<String> correlationId) {
-        return search(correlationId, Optional.empty(), Optional.empty(), Optional.empty());
-    }
-
-    @GET
-    @Timed
-    @Path("/digest/{digest}")
-    public SearchResponse digest(@PathParam("digest") Optional<String> digest) {
-        return search(Optional.empty(), Optional.empty(), Optional.empty(), digest);
-    }
-
-    @GET
-    @Timed
-    @Path("/service/{service}")
-    public SearchResponse service(@PathParam("service") Optional<String> service) {
-        return search(Optional.empty(), Optional.empty(), service, Optional.empty());
-    }
-
-    @GET
-    @Timed
-    @Path("/subject/{subject}")
-    public SearchResponse subject(@PathParam("subject") Optional<String> subject) {
-        return search(Optional.empty(), subject, Optional.empty(), Optional.empty());
     }
 }

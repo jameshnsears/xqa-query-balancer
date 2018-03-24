@@ -1,6 +1,9 @@
-talk directly to postgresql
+in travis make sure db is populated, for the integration tests
 
 put version id in urls
+
+health check for connectivity to the database
+= what is its url?
 
 --
 

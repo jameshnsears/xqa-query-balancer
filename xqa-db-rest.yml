@@ -1,3 +1,19 @@
+database:
+  driverClass: org.postgresql.Driver
+  user: xqa
+  password: xqa
+  url: jdbc:postgresql://0.0.0.0:5432/xqa
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 2s
+  validationQuery: "SELECT 1;"
+  initialSize: 1
+  minSize: 1
+  maxSize: 4
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
 logging:
   level: INFO
   loggers:

@@ -6,12 +6,12 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import xqa.XqaRestConfiguration;
+import xqa.XqaDbRestConfiguration;
 import xqa.api.status.StatusResponse;
 
 public class StatusTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
 
     @Test
     public void status() {

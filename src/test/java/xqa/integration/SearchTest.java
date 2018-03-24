@@ -9,17 +9,17 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.DropwizardAppRule;
-import xqa.XqaRestConfiguration;
+import xqa.XqaDbRestConfiguration;
 import xqa.api.search.SearchResponse;
 
 public class SearchTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
 
     @Test
-    public void correlationId() {
-        final SearchResponse correlationIdSearchResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search?searchValue=123").request()
+    public void search() {
+        final SearchResponse searchResponse = RULE.client()
+                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/123").request()
                 .get(SearchResponse.class);
 
         /*
@@ -32,14 +32,14 @@ public class SearchTest {
         }
 ]
          */
-        assertThat(correlationIdSearchResponse.getSearchResponse().get(0).toString())
-                .isEqualTo("SearchResult{time=time, correlationId=1, subject=N/A, service=N/A, digest=N/A}");
+        assertThat(searchResponse.getSearchResponse().get(0).toString())
+                .isEqualTo("SearchResult{creationTime=2018-03-16 17:52:23.259682, service=ingest/02bd02c2, subject=DBER-1923-0416.xml, digest=aa84010b}");
     }
 
     @Test
-    public void correlationIdFailure() {
+    public void searchFailure() {
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> {
-            RULE.client().target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/correlationId/2").request()
+            RULE.client().target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/x").request()
                     .get(SearchResponse.class);
         }).withMessage("HTTP 400 Bad Request");
     }

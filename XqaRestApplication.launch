@@ -7,7 +7,7 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="xqa.XqaRestApplication"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="xqa.XqaDbRestApplication"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="xqa-db-rest"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
 </launchConfiguration>
