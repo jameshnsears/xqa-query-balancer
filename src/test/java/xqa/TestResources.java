@@ -16,6 +16,7 @@ public class TestResources {
     @Test
     public void search() throws IOException {
         final Jdbi jdbi = mock(Jdbi.class);
+        // http://jdbi.org/
 
         // or
         // Jdbi jdbi = Jdbi.create("jdbc:h2:mem:test"); // (H2 in-memory database)

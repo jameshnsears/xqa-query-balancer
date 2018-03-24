@@ -1,6 +1,8 @@
-in travis make sure db is populated, for the integration tests
+use like in sql
 
-put version id in urls
+use a groupby to always make sure that "subject" field is populated?
+
+in travis make sure db is populated, for the integration tests
 
 health check for connectivity to the database
 = what is its url?
