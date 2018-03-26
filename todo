@@ -1,8 +1,6 @@
-use like in sql
+use jdbi in tests - as can pick up env vars from .yml file
 
-use a groupby to always make sure that "subject" field is populated?
-
-in travis make sure db is populated, for the integration tests
+run static analysis
 
 health check for connectivity to the database
 = what is its url?

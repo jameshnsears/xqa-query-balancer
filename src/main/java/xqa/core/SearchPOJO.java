@@ -1,4 +1,4 @@
-package xqa.api.core;
+package xqa.core;
 
 public class SearchPOJO {
     public String creationTime;

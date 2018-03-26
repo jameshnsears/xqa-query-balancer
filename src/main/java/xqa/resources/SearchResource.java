@@ -1,25 +1,18 @@
 package xqa.resources;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
+import com.codahale.metrics.annotation.Timed;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.codahale.metrics.annotation.Timed;
-
-import xqa.api.core.SearchPOJO;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
+import xqa.core.SearchPOJO;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Optional;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)
@@ -42,40 +35,19 @@ public class SearchResource {
 
         SearchResponse searchResponse = new SearchResponse();
 
-        /*
-        -- confirm where content distributed
-select info->>'serviceId' as serviceid, count(distinct(info->>'correlationId')) as items
-from events
-group by serviceid
-
-
--- it's possible for shard to START / END before ingestbalancer END'd
-select info->>'creationTime' as creationtime,
-info->>'serviceId' as serviceid,
-info->>'size' as size,
-info->>'poolSize' as poolsize,
-info->>'state' as state,
-info->>'correlationId' as correlationid,
-info->>'digest' as digest
-from events
-where info->>'correlationId' in (
-select distinct(info->>'correlationId') as correlationid
-from events
-where info->>'source' like '%/xml/SP-MAIN-245-m0130-cm.xml%'
-)
-order by events.when asc;
-
-
-         */
-
-
         List<SearchPOJO> users = jdbi.withHandle(handle -> {
-            String sql = "select info->>'creationTime' as creationTime,\n" +
-                    "       info->>'serviceId' as serviceId,\n" +
-                    "       info->>'source' as subject,\n" +
-                    "       info->>'digest' as digest\n" +
-                    "from events\n" +
-                    "order by events.when asc;";
+            String sql = "select distinct to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, " +
+                    "info->>'serviceId' as serviceId, " +
+                    "info->>'source' as subject, " +
+                    "info->>'digest' as digest " +
+                    "from events " +
+                    "where (info->>'serviceId' like '%d6f04c9881%' " +
+                    "or info->>'source' like '%d6f04c9881%' " +
+                    "or info->>'digest' like '%d6f04c9881%')" +
+                    "and info->>'state' = 'START'" +
+                    "order by to_timestamp( (info->>'creationTime')::double precision / 1000) asc;";
+
+            logger.info(sql);
 
             return handle.createQuery(sql)
                     .map((rs, ctx) -> new SearchPOJO(rs.getString("creationTime"), rs.getString("serviceId"), rs.getString("subject"), rs.getString("digest")))

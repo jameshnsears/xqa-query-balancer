@@ -9,10 +9,16 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xqa.XqaDbRestConfiguration;
 import xqa.api.search.SearchResponse;
 
 public class SearchTest {
+    private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
+
     @ClassRule
     public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
 
