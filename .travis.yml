@@ -16,18 +16,12 @@ cache:
   - $HOME/.m2
 
 before_script:
-  - sudo service postgresql stop
-  - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
+  - docker-compose -p "dev" up -d xqa-db
+
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 
 script:
-  - docker network create xqa
-
-  - docker volume create xqa-db
-  - docker pull jameshnsears/xqa-db
-  - docker run -d --net="xqa" --name="xqa-db" -p 5432:5432 jameshnsears/xqa-db
-
   - mvn clean test
-  - mvn package -DskipTests
 
 after_success:
   - mvn jacoco:report coveralls:report

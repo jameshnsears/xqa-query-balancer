@@ -10,7 +10,7 @@ import xqa.XqaDbRestConfiguration;
 
 public class HealthTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.configuration;
 
     @Test
     public void health() {

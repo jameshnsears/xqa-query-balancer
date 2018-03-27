@@ -15,7 +15,7 @@ import xqa.api.xquery.XQueryResponse;
 
 public class XQueryTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.configuration;
 
     @Test
     public void xquery() {

@@ -23,14 +23,14 @@ public class SearchTest {
     private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
 
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> application = TestSuite.configuration;
 
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
     @Test
     public void search() throws IOException {
-        final SearchResponse searchResponse = RULE.client()
-                .target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/d6f04c9881").request()
+        final SearchResponse searchResponse = application.client()
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/d6f04c9881").request()
                 .get(SearchResponse.class);
 
         assertThat(searchResponse.getSearchResponse().size() == 6);
@@ -43,7 +43,7 @@ public class SearchTest {
     @Test
     public void searchFailure() {
         assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> {
-            RULE.client().target("http://127.0.0.1:" + RULE.getLocalPort() + "/search/nothingtofind").request()
+            application.client().target("http://127.0.0.1:" + application.getLocalPort() + "/search/0123456789").request()
                     .get(SearchResponse.class);
         }).withMessage("HTTP 400 Bad Request");
     }

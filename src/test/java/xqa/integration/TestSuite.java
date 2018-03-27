@@ -12,6 +12,6 @@ import xqa.XqaDbRestConfiguration;
 @Suite.SuiteClasses({ SetupDatabase.class, SearchTest.class, StatusTest.class, XQueryTest.class })
 public class TestSuite {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = new DropwizardAppRule<>(
+    public static final DropwizardAppRule<XqaDbRestConfiguration> configuration = new DropwizardAppRule<>(
             XqaDbRestApplication.class, ResourceHelpers.resourceFilePath("xqa-db-rest.yml"));
 }

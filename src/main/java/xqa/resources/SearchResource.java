@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
-import xqa.core.SearchPOJO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -30,7 +29,7 @@ public class SearchResource {
     public SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
         logger.debug("searchString={}", searchString.orElse("*"));
 
-        List<SearchPOJO> searchResults
+        List<SearchResult> searchResults
                 = jdbi.withHandle(handle -> {
             String sql = "select distinct to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, " +
                     "info->>'serviceId' as serviceId, " +
@@ -44,7 +43,7 @@ public class SearchResource {
                     "order by to_timestamp( (info->>'creationTime')::double precision / 1000) asc;";
             logger.info(sql);
             return handle.createQuery(sql)
-                    .map((rs, ctx) -> new SearchPOJO(rs.getString("creationTime"), rs.getString("serviceId"), rs.getString("subject"), rs.getString("digest")))
+                    .map((rs, ctx) -> new SearchResult(rs.getString("creationTime"), rs.getString("serviceId"), rs.getString("subject"), rs.getString("digest")))
                     .list();
         });
 
@@ -52,11 +51,11 @@ public class SearchResource {
             throw new WebApplicationException("No Search Criteria", Response.Status.BAD_REQUEST);
 
         SearchResponse searchResponse = new SearchResponse();
-        for (SearchPOJO searchPOJO: searchResults) {
-            searchResponse.getSearchResponse().add(new SearchResult(searchPOJO.creationTime,
-                    searchPOJO.serviceId,
-                    searchPOJO.source,
-                    searchPOJO.digest));
+        for (SearchResult searchResult: searchResults) {
+            searchResponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
+                    searchResult.getServiceId(),
+                    searchResult.getSubject(),
+                    searchResult.getdigest()));
         }
 
         return searchResponse;

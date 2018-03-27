@@ -5,16 +5,16 @@ import com.google.common.base.MoreObjects;
 
 public class SearchResult {
     private String creationTime;
-    private String service;
+    private String serviceId;
     private String subject;
     private String digest;
 
     public SearchResult() {
     }
 
-    public SearchResult(String creationTime, String service, String subject, String digest) {
+    public SearchResult(String creationTime, String serviceId, String subject, String digest) {
         this.creationTime = creationTime;
-        this.service = service;
+        this.serviceId = serviceId;
         this.subject = subject;
         this.digest = digest;
     }
@@ -26,12 +26,14 @@ public class SearchResult {
 
     @JsonProperty
     public String getSubject() {
+        if (subject == null)
+            return "";
         return subject;
     }
 
     @JsonProperty
-    public String getService() {
-        return service;
+    public String getServiceId() {
+        return serviceId;
     }
 
     @JsonProperty
@@ -41,6 +43,6 @@ public class SearchResult {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("creationTime", creationTime).add("service", service).add("subject", subject).add("digest", digest).toString();
+        return MoreObjects.toStringHelper(this).add("creationTime", creationTime).add("serviceId", serviceId).add("subject", subject).add("digest", digest).toString();
     }
 }

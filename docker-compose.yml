@@ -13,8 +13,7 @@ services:
   xqa-db-rest:
     build: .
     image: "xqa-db-rest"
-    command: ["-storage_host", "xqa-db"]
-    image: "xqa-db-rest"
+    command: ["server", "xqa-db-rest.yml"]
     depends_on:
       - xqa-db
     networks:

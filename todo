@@ -1,5 +1,9 @@
 use jdbi in tests - as can pick up env vars from .yml file
 
+test:
+.../sears/shard/06817556
+= see if final slash a problem.
+
 run static analysis
 
 health check for connectivity to the database

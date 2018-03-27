@@ -11,7 +11,7 @@ import xqa.api.status.StatusResponse;
 
 public class StatusTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.RULE;
+    public static final DropwizardAppRule<XqaDbRestConfiguration> RULE = TestSuite.configuration;
 
     @Test
     public void status() {

@@ -28,9 +28,9 @@ or
 * docker-compose -p "dev" up -d
 
 #### 3.2.1. Endpoints
-* curl http://127.0.0.1:8080/search/correlationId/2
+* curl http://127.0.0.1:8080/search/shard/1234
 * curl http://127.0.0.1:8080/status
-* curl http://127.0.0.1:8080/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"//", "content": "ppp"}'
+* curl http://127.0.0.1:8080/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
 * curl -X POST http://127.0.0.1:8081/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
 * curl -X POST http://127.0.0.1:8081/tasks/gc
