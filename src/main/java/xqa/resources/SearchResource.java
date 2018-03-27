@@ -30,31 +30,34 @@ public class SearchResource {
     public SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
         logger.debug("searchString={}", searchString.orElse("*"));
 
-        if (searchString.toString().equals("Optional[x]"))
-            throw new WebApplicationException(String.format("x"), Response.Status.BAD_REQUEST);
-
-        SearchResponse searchResponse = new SearchResponse();
-
-        List<SearchPOJO> users = jdbi.withHandle(handle -> {
+        List<SearchPOJO> searchResults
+                = jdbi.withHandle(handle -> {
             String sql = "select distinct to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, " +
                     "info->>'serviceId' as serviceId, " +
                     "info->>'source' as subject, " +
                     "info->>'digest' as digest " +
                     "from events " +
-                    "where (info->>'serviceId' like '%d6f04c9881%' " +
-                    "or info->>'source' like '%d6f04c9881%' " +
-                    "or info->>'digest' like '%d6f04c9881%')" +
+                    "where (info->>'serviceId' like '%" + searchString.get() + "%' " +
+                    "or info->>'source' like '%" + searchString.get() + "%' " +
+                    "or info->>'digest' like '%" + searchString.get() + "%')" +
                     "and info->>'state' = 'START'" +
                     "order by to_timestamp( (info->>'creationTime')::double precision / 1000) asc;";
-
             logger.info(sql);
-
             return handle.createQuery(sql)
                     .map((rs, ctx) -> new SearchPOJO(rs.getString("creationTime"), rs.getString("serviceId"), rs.getString("subject"), rs.getString("digest")))
                     .list();
         });
 
-        searchResponse.getSearchResponse().add(new SearchResult("2018-03-16 17:52:23.259682", "ingest/02bd02c2", "DBER-1923-0416.xml", "aa84010b"));
+        if (searchResults.isEmpty())
+            throw new WebApplicationException("No Search Criteria", Response.Status.BAD_REQUEST);
+
+        SearchResponse searchResponse = new SearchResponse();
+        for (SearchPOJO searchPOJO: searchResults) {
+            searchResponse.getSearchResponse().add(new SearchResult(searchPOJO.creationTime,
+                    searchPOJO.serviceId,
+                    searchPOJO.source,
+                    searchPOJO.digest));
+        }
 
         return searchResponse;
     }
