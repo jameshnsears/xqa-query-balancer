@@ -1,6 +1,5 @@
 package xqa.integration;
 
-import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,15 +14,14 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 
-public class SetupDatabase {
-    private static final Logger logger = LoggerFactory.getLogger(SetupDatabase.class);
+public class DatabaseFixture {
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
     private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("populate-database").getPath();
     }
 
-    @Test
-    public void setupDatabase() throws Exception {
+    protected void setupDatabase() throws Exception {
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection("jdbc:postgresql://0.0.0.0:5432/xqa", "xqa", "xqa");
         truncate(connection);

@@ -9,11 +9,9 @@ import xqa.api.xquery.XQueryResponse;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("/xquery")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,9 +27,12 @@ public class XQueryResource {
     @POST
     @Timed
     public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) { // json in
+        if (xquery.getXqueryRequest().isEmpty())
+            throw new WebApplicationException("No XQuery", Response.Status.BAD_REQUEST);
+
         logger.debug(xquery.toString());
 
-        XQueryResponse response = new XQueryResponse("<a>b</a>");
+        XQueryResponse response = new XQueryResponse("<some xquery response/>");
 
         return response; // json out
     }

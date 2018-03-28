@@ -5,7 +5,7 @@
 
 ### 1.1. Maven
 * rm -rf $HOME/.m2/*
-* mvn package -DskipTestsor
+* mvn clean package -DskipTests
 
 ### 1.2. Docker
 * docker-compose -p "dev" build --force-rm
@@ -16,7 +16,7 @@
 ## 3. Test
 
 ### 3.1. Maven
-* mvn clean compile test
+* java -jar lib/junit-platform-console-standalone-1.1.0.jar --cp target/dependency/*:target/classes:target/test-classes --scan-class-path
 * mvn jacoco:report coveralls:report
 * mvn site  # findbugs
 
@@ -29,7 +29,6 @@ or
 
 #### 3.2.1. Endpoints
 * curl http://127.0.0.1:8080/search/shard/1234
-* curl http://127.0.0.1:8080/status
 * curl http://127.0.0.1:8080/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
 * curl -X POST http://127.0.0.1:8081/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
