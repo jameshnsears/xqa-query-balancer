@@ -32,6 +32,14 @@ public class XQueryResource {
 
         logger.debug(xquery.toString());
 
+        /*
+        TODO
+
+        . request / response to xqa-query-balancer queue
+        = http://activemq.apache.org/how-should-i-implement-request-response-with-jms.html
+        = receive json back
+         */
+
         XQueryResponse response = new XQueryResponse("<some xquery response/>");
 
         return response; // json out

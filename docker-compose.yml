@@ -2,7 +2,7 @@ version: '3'
 
 services:
   xqa-db:
-    image: jameshnsears/xqa-db
+    image: jameshnsears/xqa-db:latest
     volumes:
       - "xqa-db:/var/lib/postgresql"
     ports:

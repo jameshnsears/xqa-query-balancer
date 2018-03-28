@@ -16,11 +16,12 @@ cache:
   - $HOME/.m2
 
 before_script:
+  - sudo service postgresql stop
+  - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
+
+before_script:
   - docker-compose -p "dev" up -d xqa-db
-
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-
-script:
   - mvn clean test
 
 after_success:

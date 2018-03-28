@@ -1,4 +1,14 @@
-use jdbi in tests - as can pick up env vars from .yml file
+rm xqa-query-balancer
+- from docs + uml + prj.
+
+ensure all projects using latests 0.31.0 jms
+
+rename xqa-db-rest into xqa-query-balancer
+
+carry on XQueryTest
+
+how to stop from a url?
+= as facilitates more testing?
 
 test:
 .../sears/shard/06817556
@@ -9,11 +19,8 @@ run static analysis
 health check for connectivity to the database
 = what is its url?
 
---
-
-use http://square.github.io/okhttp/ for integration test for health?
-+
-use in combination with gson?
+in xqa-ui
+= specify a timeout on the requests?
 
 --
 

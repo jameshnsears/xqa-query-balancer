@@ -15,7 +15,6 @@ import xqa.api.xquery.XQueryResponse;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-
 import java.io.IOException;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
