@@ -10,10 +10,10 @@ services:
     networks:
       - xqa
 
-  xqa-db-rest:
+  xqa-query-balancer:
     build: .
-    image: "xqa-db-rest"
-    command: ["server", "xqa-db-rest.yml"]
+    image: "xqa-query-balancer"
+    command: ["server", "xqa-query-balancer.yml"]
     depends_on:
       - xqa-db
     networks:

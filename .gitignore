@@ -4,4 +4,4 @@ dependency-reduced-pom.xml
 logs
 tags
 /target/
-xqa-db-rest.iml
+xqa-query-balancer.iml

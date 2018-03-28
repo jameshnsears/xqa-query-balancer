@@ -7,8 +7,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.junit.ClassRule;
 import org.junit.Test;
-import xqa.XqaDbRestApplication;
-import xqa.XqaDbRestConfiguration;
+import xqa.XqaQueryBalancerApplication;
+import xqa.XqaQueryBalancerConfiguration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,8 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class HealthTest {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> application = new DropwizardAppRule<>(
-            XqaDbRestApplication.class, ResourceHelpers.resourceFilePath("xqa-db-rest.yml"));
+    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+            XqaQueryBalancerApplication.class, ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
     @Test
     public void health() throws IOException {

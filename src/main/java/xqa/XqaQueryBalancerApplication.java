@@ -13,26 +13,26 @@ import xqa.health.MessageBrokerHealthCheck;
 import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
 
-public class XqaDbRestApplication extends Application<XqaDbRestConfiguration> {
+public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
     private static final Logger logger = LoggerFactory.getLogger(SearchResource.class);
 
     public static void main(String[] args) throws Exception {
-        new XqaDbRestApplication().run(args);
+        new XqaQueryBalancerApplication().run(args);
     }
 
     @Override
     public String getName() {
-        return "xqa-db-rest";
+        return "xqa-query-balancer";
     }
 
     @Override
-    public void initialize(Bootstrap<XqaDbRestConfiguration> bootstrap) {
+    public void initialize(Bootstrap<XqaQueryBalancerConfiguration> bootstrap) {
         bootstrap.setConfigurationSourceProvider(new SubstitutingSourceProvider(
                 bootstrap.getConfigurationSourceProvider(), new EnvironmentVariableSubstitutor(false)));
     }
 
     @Override
-    public void run(XqaDbRestConfiguration configuration, Environment environment) {
+    public void run(XqaQueryBalancerConfiguration configuration, Environment environment) {
         environment.healthChecks().register("MessageBrokerHealthCheck", new MessageBrokerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();

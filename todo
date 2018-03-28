@@ -3,6 +3,8 @@ rm xqa-query-balancer
 
 ensure all projects using latests 0.31.0 jms
 
+pass in a param for xqa-message-broker
+
 rename xqa-db-rest into xqa-query-balancer
 
 carry on XQueryTest

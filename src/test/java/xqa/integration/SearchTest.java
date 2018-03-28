@@ -8,8 +8,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xqa.XqaDbRestApplication;
-import xqa.XqaDbRestConfiguration;
+import xqa.XqaQueryBalancerApplication;
+import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
 
@@ -21,8 +21,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SearchTest extends DatabaseFixture {
     @ClassRule
-    public static final DropwizardAppRule<XqaDbRestConfiguration> application = new DropwizardAppRule<>(
-            XqaDbRestApplication.class, ResourceHelpers.resourceFilePath("xqa-db-rest.yml"));
+    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+            XqaQueryBalancerApplication.class, ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
     private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 

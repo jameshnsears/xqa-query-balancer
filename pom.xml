@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>xqa</groupId>
-    <artifactId>xqa-db-rest</artifactId>
+    <artifactId>xqa-query-balancer</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>xqa-db-rest</name>
-    <url>http://github.com/jameshnsears/xqa-db-rest</url>
+    <name>xqa-query-balancer</name>
+    <url>http://github.com/jameshnsears/xqa-query-balancer</url>
     <packaging>jar</packaging>
 
     <properties>

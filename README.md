@@ -1,5 +1,7 @@
-# xqa-db-rest [![Build Status](https://travis-ci.org/jameshnsears/xqa-db-rest.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-db-rest) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-db-rest/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-db-rest?branch=master)
-* a REST to PostgresSQL interface.
+# xqa-query-balancer [![Build Status](https://travis-ci.org/jameshnsears/xqa-query-balancer.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-query-balancer) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-query-balancer/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-query-balancer?branch=master)
+* provides a REST API to execute:
+    * SQL/JSON against xqa-db.
+    * XQuery against each xqa-shard and materialises the results.
 
 ## 1. Build
 
@@ -16,12 +18,12 @@
 ## 3. Test
 
 ### 3.1. Maven
-* java -jar lib/junit-platform-console-standalone-1.1.0.jar --cp target/dependency/*:target/classes:target/test-classes --scan-class-path
+* mvn test
 * mvn jacoco:report coveralls:report
 * mvn site  # findbugs
 
 ### 3.2. CLI
-* java -jar target/xqa-db-rest-1.0.0-SNAPSHOT.jar server xqa-db-rest.yml
+* java -jar target/xqa-query-balancer-1.0.0-SNAPSHOT.jar server xqa-query-balancer.yml
 
 or
 
