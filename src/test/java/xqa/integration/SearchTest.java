@@ -12,7 +12,6 @@ import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
 
 import javax.ws.rs.BadRequestException;
-
 import java.io.IOException;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
@@ -20,11 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SearchTest {
-    private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
-
     @ClassRule
     public static final DropwizardAppRule<XqaDbRestConfiguration> application = TestSuite.configuration;
-
+    private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
     @Test

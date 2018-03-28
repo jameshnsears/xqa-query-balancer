@@ -9,7 +9,7 @@ import xqa.XqaDbRestApplication;
 import xqa.XqaDbRestConfiguration;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({ SetupDatabase.class, SearchTest.class, StatusTest.class, XQueryTest.class })
+@Suite.SuiteClasses({SetupDatabase.class, SearchTest.class, XQueryTest.class})
 public class TestSuite {
     @ClassRule
     public static final DropwizardAppRule<XqaDbRestConfiguration> configuration = new DropwizardAppRule<>(

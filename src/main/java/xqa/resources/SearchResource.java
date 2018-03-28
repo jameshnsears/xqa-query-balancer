@@ -51,7 +51,7 @@ public class SearchResource {
             throw new WebApplicationException("No Search Criteria", Response.Status.BAD_REQUEST);
 
         SearchResponse searchResponse = new SearchResponse();
-        for (SearchResult searchResult: searchResults) {
+        for (SearchResult searchResult : searchResults) {
             searchResponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
                     searchResult.getServiceId(),
                     searchResult.getSubject(),

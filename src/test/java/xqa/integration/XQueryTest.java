@@ -1,17 +1,16 @@
 package xqa.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.junit.ClassRule;
+import org.junit.Test;
+import xqa.XqaDbRestConfiguration;
+import xqa.api.xquery.XQueryRequest;
+import xqa.api.xquery.XQueryResponse;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import xqa.XqaDbRestConfiguration;
-import xqa.api.xquery.XQueryRequest;
-import xqa.api.xquery.XQueryResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class XQueryTest {
     @ClassRule

@@ -1,12 +1,11 @@
 package xqa.integration;
 
-import static org.assertj.core.api.Assertions.fail;
-
+import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.junit.ClassRule;
 import org.junit.Test;
-
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import xqa.XqaDbRestConfiguration;
+
+import static org.assertj.core.api.Assertions.fail;
 
 public class HealthTest {
     @ClassRule

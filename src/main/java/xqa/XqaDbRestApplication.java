@@ -1,7 +1,6 @@
 package xqa;
 
 import io.dropwizard.Application;
-import io.dropwizard.configuration.ConfigurationValidationException;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.jdbi3.JdbiFactory;
@@ -12,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.health.MessageBrokerHealthCheck;
 import xqa.resources.SearchResource;
-import xqa.resources.StatusResource;
 import xqa.resources.XQueryResource;
 
 public class XqaDbRestApplication extends Application<XqaDbRestConfiguration> {
@@ -41,7 +39,6 @@ public class XqaDbRestApplication extends Application<XqaDbRestConfiguration> {
         final Jdbi jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgresql");
         environment.jersey().register(new SearchResource(jdbi));
 
-        environment.jersey().register(new XQueryResource());
-        environment.jersey().register(new StatusResource());
+        environment.jersey().register(new XQueryResource(jdbi));
     }
 }
