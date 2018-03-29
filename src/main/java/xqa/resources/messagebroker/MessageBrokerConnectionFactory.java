@@ -6,7 +6,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.util.Hashtable;
 
-public class QueryBalancerConnectionFactory {
+public class MessageBrokerConnectionFactory {
     static public ConnectionFactory messageBroker(final String messageBrokerHost) throws Exception {
         Hashtable<String, String> env = new Hashtable<>();
         env.put("connectionfactory.url.amqp", "amqp://" + messageBrokerHost + ":5672/");

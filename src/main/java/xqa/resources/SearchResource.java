@@ -20,13 +20,15 @@ public class SearchResource {
     private final Jdbi jdbi;
 
     public SearchResource(Jdbi jdbi) {
-        this.jdbi = jdbi;
+        synchronized(this) {
+            this.jdbi = jdbi;
+        }
     }
 
     @GET
     @Timed
     @Path("/{searchString : .+}")
-    public SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
+    public synchronized SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
         logger.debug("searchString={}", searchString.orElse("*"));
 
         List<SearchResult> searchResults

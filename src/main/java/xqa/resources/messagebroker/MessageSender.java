@@ -12,7 +12,7 @@ public class MessageSender {
     private Session session;
 
     public MessageSender(String messageBrokerHost) throws Exception {
-        ConnectionFactory factory = QueryBalancerConnectionFactory.messageBroker(messageBrokerHost);
+        ConnectionFactory factory = MessageBrokerConnectionFactory.messageBroker(messageBrokerHost);
 
         int retryAttempts = 3;
         boolean connected = false;
