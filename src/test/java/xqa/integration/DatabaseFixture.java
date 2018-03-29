@@ -21,7 +21,7 @@ public class DatabaseFixture {
         return Thread.currentThread().getContextClassLoader().getResource("populate-database").getPath();
     }
 
-    protected void setupDatabase() throws Exception {
+    void setupDatabase() throws Exception {
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection("jdbc:postgresql://0.0.0.0:5432/xqa", "xqa", "xqa");
         truncate(connection);

@@ -20,7 +20,7 @@ before_script:
   - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
 
 script:
-  - docker-compose -p "dev" up -d xqa-db
+  - docker-compose -p "dev" up -d xqa-db xqa-message-broker
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - mvn clean test
 

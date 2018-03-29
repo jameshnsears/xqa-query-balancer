@@ -10,17 +10,29 @@ services:
     networks:
       - xqa
 
+  xqa-message-broker:
+    image: jameshnsears/xqa-message-broker:latest
+    ports:
+      - "5672:5672"
+      - "8161:8161"
+    volumes:
+      - "xqa-message-broker:/opt/apache-activemq-5.15.3/data"
+    networks:
+      - xqa
+
   xqa-query-balancer:
     build: .
     image: "xqa-query-balancer"
     command: ["server", "xqa-query-balancer.yml"]
     depends_on:
       - xqa-db
+      - xqa-message-broker
     networks:
       - xqa
 
 volumes:
   xqa-db:
+  xqa-message-broker:
 
 networks:
   xqa:

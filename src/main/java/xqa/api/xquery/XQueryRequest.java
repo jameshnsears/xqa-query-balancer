@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 
 public class XQueryRequest {
-    public String xqueryRequest = "";
+    private String xqueryRequest = "";
 
     public XQueryRequest() {
         // Jackson deserialization

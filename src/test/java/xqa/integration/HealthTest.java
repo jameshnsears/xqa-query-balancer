@@ -21,7 +21,7 @@ public class HealthTest {
             XqaQueryBalancerApplication.class, ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
     @Test
-    public void health() throws IOException {
+    public void queryBalancerHealth() throws IOException {
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()

@@ -17,7 +17,7 @@ import java.util.Optional;
 @Produces(MediaType.APPLICATION_JSON)
 public class SearchResource {
     private static final Logger logger = LoggerFactory.getLogger(SearchResource.class);
-    private Jdbi jdbi;
+    private final Jdbi jdbi;
 
     public SearchResource(Jdbi jdbi) {
         this.jdbi = jdbi;
@@ -25,7 +25,7 @@ public class SearchResource {
 
     @GET
     @Timed
-    @Path("/{searchString}")
+    @Path("/{searchString : .+}")
     public SearchResponse subject(@PathParam("searchString") Optional<String> searchString) {
         logger.debug("searchString={}", searchString.orElse("*"));
 

@@ -29,3 +29,7 @@ logging:
       archivedFileCount: 7
       timeZone: UTC
       maxFileSize: '1mb'
+
+messageBroker:
+  host: 0.0.0.0
+  xqueryDestination: 'topic://xqa.shard.xquery'

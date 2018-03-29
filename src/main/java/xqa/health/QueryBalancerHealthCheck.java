@@ -2,9 +2,9 @@ package xqa.health;
 
 import com.codahale.metrics.health.HealthCheck;
 
-public class MessageBrokerHealthCheck extends HealthCheck {
+public class QueryBalancerHealthCheck extends HealthCheck {
 
-    public MessageBrokerHealthCheck() {
+    public QueryBalancerHealthCheck() {
     }
 
     @Override

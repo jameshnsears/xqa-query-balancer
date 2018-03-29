@@ -18,6 +18,7 @@ import javax.ws.rs.BadRequestException;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.Assert.*;
 
 public class SearchTest extends DatabaseFixture {
     @ClassRule
@@ -34,8 +35,6 @@ public class SearchTest extends DatabaseFixture {
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/search/d6f04c9881").request()
                 .get(SearchResponse.class);
 
-        assertThat(searchResponse.getSearchResponse().size() == 6);
-
         final String expected = objectMapper.writeValueAsString(objectMapper.readValue(fixture("fixtures/search.json"), SearchResult[].class));
 
         assertThat(objectMapper.writeValueAsString(searchResponse.getSearchResponse())).isEqualTo(expected);
@@ -43,9 +42,18 @@ public class SearchTest extends DatabaseFixture {
 
     @Test
     public void searchFailure() {
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> {
-            application.client().target("http://127.0.0.1:" + application.getLocalPort() + "/search/0123456789").request()
-                    .get(SearchResponse.class);
-        }).withMessage("HTTP 400 Bad Request");
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> application.client().target("http://127.0.0.1:" + application.getLocalPort() + "/search/0123456789").request()
+                .get(SearchResponse.class)).withMessage("HTTP 400 Bad Request");
+    }
+
+    @Test
+    public void searchWithSlash() throws Exception {
+        setupDatabase();
+
+        final SearchResponse searchResponse = application.client()
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/shard/e540188c").request()
+                .get(SearchResponse.class);
+
+        assertEquals(40, searchResponse.getSearchResponse().size());
     }
 }

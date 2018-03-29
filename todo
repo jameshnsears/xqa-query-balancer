@@ -1,20 +1,17 @@
-rm xqa-query-balancer
-- from docs + uml + prj.
+carry on XQueryTest
 
-ensure all projects using latests 0.31.0 jms
+use Executors.newCachedThreadPool();?
 
 pass in a param for xqa-message-broker
 
-rename xqa-db-rest into xqa-query-balancer
+https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/
+= for observing testing
 
-carry on XQueryTest
+jmeter for testing?
 
-how to stop from a url?
-= as facilitates more testing?
-
-test:
-.../sears/shard/06817556
-= see if final slash a problem.
+test xquery with multiple concurrent requests
+= for threading issues.
+= using multiple shards
 
 run static analysis
 
@@ -24,54 +21,10 @@ health check for connectivity to the database
 in xqa-ui
 = specify a timeout on the requests?
 
---
-
-create a python test with requests - that's incorporated with travis
-
---
-
-create domain objects in "core" package for the amqp message handling - which are request/response messages
-
---
-
-
-use optional in api
-
---
-
 have a /tasks/my_task to gracefully shutdown the app
 
 https://stackoverflow.com/questions/31288721/dropwizard-shutdown-hook
 http://www.dropwizard.io/1.2.2/docs/manual/core.html#tasks
 
---
-
 have a proper health check - tests that amqp server reachable?
 = TemplateHealthCheck
-
---
-
-Metrics
-
-Every resource method can be annotated with @Timed, @Metered, and @ExceptionMetered. Dropwizard augments Jersey to automatically record runtime information about your resource methods.
-
-    @Timed measures the duration of requests to a resource
-    @Metered measures the rate at which the resource is accessed
-    @ExceptionMetered measures how often exceptions occur processing the resource
-
---
-
-api: Representations. Request and response bodies.
-= json pojo request / reponse
-
-core:
-= domain objects, not used by api
-
-resources: Resources
-= manages api
-
---
-
-http://joel-costigliola.github.io/assertj/index.html
-
-http://www.studytrails.com/java/json/java-google-json-introduction/
