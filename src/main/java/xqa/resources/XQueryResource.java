@@ -28,6 +28,7 @@ public class XQueryResource {
 
     private final String serviceId;
     private final String messageBrokerHost;
+    private final String xqueryDestination;
     public final Vector<Message> xqueryResponsesFromShards;
     private MessageSender messageSender;
     private ObjectMapper mapper = new ObjectMapper();
@@ -37,6 +38,7 @@ public class XQueryResource {
         synchronized (this) {
             this.serviceId = serviceId;
             this.messageBrokerHost = messageBrokerConfiguration.getHost();
+            this.xqueryDestination= messageBrokerConfiguration.getXqueryDestination();
             xqueryResponsesFromShards = new Vector<>();
         }
     }
@@ -49,34 +51,40 @@ public class XQueryResource {
 
         logger.debug(xquery.toString());
 
+    /*
+        Message xqueryMessageToSendToShards = createXQueryMessage();
+        sendAuditEvent("START");
+        XQueryResponse xqueryResponse = collateXQueryResponsesFromShards()
+        sendAuditEvent("END");
+     */
 
 
 
 
-        String correlationId = UUID.randomUUID().toString();
-        try {
-            synchronized (this) {
-                messageSender = new MessageSender(messageBrokerHost);
-
-                sendEventToMessageBroker(
-                        new QueryBalancerEvent(serviceId, correlationId,
-                                DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "START"));
-            }
-
-            sendXQueryToShards();
-            logger.info("" + xqueryResponsesFromShards.size());
-
-            synchronized (this) {
-                sendEventToMessageBroker(new QueryBalancerEvent(serviceId, correlationId,
-                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "END"));
-
-                messageSender.close();
-            }
-        } catch (Exception exception) {
-            logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
-        }
+//        String correlationId = UUID.randomUUID().toString();
+//        try {
+//            synchronized (this) {
+//                messageSender = new MessageSender(messageBrokerHost);
+//
+//                sendEventToMessageBroker(
+//                        new QueryBalancerEvent(serviceId, correlationId,
+//                                DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "START"));
+//            }
+//
+//            sendXQueryToShards();
+//            logger.info("" + xqueryResponsesFromShards.size());
+//
+//            synchronized (this) {
+//                sendEventToMessageBroker(new QueryBalancerEvent(serviceId, correlationId,
+//                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "END"));
+//
+//                messageSender.close();
+//            }
+//        } catch (Exception exception) {
+//            logger.error(exception.getMessage());
+//            exception.printStackTrace();
+//            System.exit(1);
+//        }
 
 
 
@@ -101,7 +109,7 @@ public class XQueryResource {
 
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Destination sizeDestination = session.createTopic("xqa.shard.sendXqueryToShards");
+        Destination sizeDestination = session.createTopic("xqa.shard.xquery");
         Destination sizeReplyToDestination = session.createTemporaryQueue();
 
         sendXQueryRequest(session, sizeDestination, sizeReplyToDestination);
