@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.glassfish.jersey.client.ClientProperties;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class XQueryTest {
     @Test
     public void xquery() throws IOException {
         final XQueryResponse xqueryResponse = application.client()
+                .property(ClientProperties.READ_TIMEOUT, 6000)
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/xquery")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.json(new XQueryRequest("count(/)")))

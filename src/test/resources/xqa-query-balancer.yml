@@ -6,7 +6,7 @@ database:
   properties:
     charSet: UTF-8
   maxWaitForConnection: 2s
-  validationQuery: "SELECT 1;"
+  validationQuery: SELECT 1;
   initialSize: 1
   minSize: 1
   maxSize: 4
@@ -23,12 +23,15 @@ logging:
   appenders:
     - type: console
     - type: file
-      currentLogFilename: './logs/application.log'
-      archivedLogFilenamePattern: './logs/application-%d-%i.log.gz'
+      currentLogFilename: ./logs/application.log
+      archivedLogFilenamePattern: ./logs/application-%d-%i.log.gz
       archive: true
       archivedFileCount: 7
-      maxFileSize: '1mb'
+      maxFileSize: 1mb
 
 messageBroker:
   host: 0.0.0.0
-  xqueryDestination: 'topic://xqa.shard.xquery'
+  userName: admin
+  password: admin
+  xqueryDestination: xqa.shard.xquery
+  auditDestination: xqa.db.amqp.insert_event

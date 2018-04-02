@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xqa.resources.messagebroker.*;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
+import xqa.resources.messagebroker.*;
 
 import javax.jms.*;
 import javax.validation.Valid;
@@ -15,7 +15,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -26,20 +25,16 @@ import java.util.Vector;
 public class XQueryResource {
     private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
 
+    private final MessageBrokerConfiguration messageBrokerConfiguration;
+
     private final String serviceId;
-    private final String messageBrokerHost;
-    private final String xqueryDestination;
-    public final Vector<Message> xqueryResponsesFromShards;
-    private MessageSender messageSender;
     private ObjectMapper mapper = new ObjectMapper();
-    private Message xqueryRequestMessage = null;
 
     public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId) {
         synchronized (this) {
+            this.messageBrokerConfiguration = messageBrokerConfiguration;
+
             this.serviceId = serviceId;
-            this.messageBrokerHost = messageBrokerConfiguration.getHost();
-            this.xqueryDestination= messageBrokerConfiguration.getXqueryDestination();
-            xqueryResponsesFromShards = new Vector<>();
         }
     }
 
@@ -49,118 +44,134 @@ public class XQueryResource {
         if (xquery.getXqueryRequest().isEmpty())
             throw new WebApplicationException("No XQuery", Response.Status.BAD_REQUEST);
 
-        logger.debug(xquery.toString());
+        logger.info(xquery.toString());
 
-    /*
-        Message xqueryMessageToSendToShards = createXQueryMessage();
-        sendAuditEvent("START");
-        XQueryResponse xqueryResponse = collateXQueryResponsesFromShards()
-        sendAuditEvent("END");
-     */
+        String correlationId = UUID.randomUUID().toString();
 
+        try {
+            MessageSender messageSender = new MessageSender(this.messageBrokerConfiguration.getHost());
 
+            synchronized (this) {
+                sendAuditEvent(
+                        messageSender,
+                        new QueryBalancerEvent(
+                                serviceId,
+                                correlationId,
+                                DigestUtils.sha256Hex(xquery.toString()),
+                                "START"));
+            }
 
+            ConnectionFactory factory = MessageBrokerConnectionFactory.messageBroker(this.messageBrokerConfiguration.getHost());
 
-//        String correlationId = UUID.randomUUID().toString();
-//        try {
-//            synchronized (this) {
-//                messageSender = new MessageSender(messageBrokerHost);
-//
-//                sendEventToMessageBroker(
-//                        new QueryBalancerEvent(serviceId, correlationId,
-//                                DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "START"));
-//            }
-//
-//            sendXQueryToShards();
-//            logger.info("" + xqueryResponsesFromShards.size());
-//
-//            synchronized (this) {
-//                sendEventToMessageBroker(new QueryBalancerEvent(serviceId, correlationId,
-//                        DigestUtils.sha256Hex(MessageLogging.getTextFromMessage(xqueryRequestMessage)), "END"));
-//
-//                messageSender.close();
-//            }
-//        } catch (Exception exception) {
-//            logger.error(exception.getMessage());
-//            exception.printStackTrace();
-//            System.exit(1);
-//        }
+            Connection connection = factory.createConnection(this.messageBrokerConfiguration.getUserName(),
+                    this.messageBrokerConfiguration.getPassword());
+            connection.start();
 
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
+            BytesMessage xqueryMessage = sendXQueryRequest(session, correlationId, xquery.toString());
 
+            Vector<Message> shardResponses = shardResponses(session, xqueryMessage);
 
+            session.close();
+            connection.close();
+
+            synchronized (this) {
+                sendAuditEvent(
+                        messageSender,
+                        new QueryBalancerEvent(
+                            serviceId,
+                            correlationId,
+                            DigestUtils.sha256Hex(xquery.toString()),
+                            "END"));
+
+                messageSender.close();
+            }
+        } catch (Exception exception) {
+            logger.error(exception.getMessage());
+            exception.printStackTrace();
+            System.exit(1);
+        }
 
         return new XQueryResponse("<some xquery response/>"); // json out
     }
 
-    private void sendEventToMessageBroker(final QueryBalancerEvent ingestBalancerEvent) throws Exception {
-        BytesMessage messageSent = messageSender.sendMessage(MessageSender.DestinationType.Queue,
-                "xqa.db.amqp.insert_event", UUID.randomUUID().toString(), null, null,
-                mapper.writeValueAsString(ingestBalancerEvent), DeliveryMode.PERSISTENT);
+
+    private void sendAuditEvent(MessageSender messageSender, final QueryBalancerEvent queryBalancerEvent) throws Exception {
+        BytesMessage messageSent = messageSender.sendMessage(
+                MessageSender.DestinationType.Queue,
+                this.messageBrokerConfiguration.getAuditDestination(),
+                UUID.randomUUID().toString(),
+                null,
+                null,
+                mapper.writeValueAsString(queryBalancerEvent), DeliveryMode.PERSISTENT);
+
         logger.debug(MessageLogging.log(MessageLogging.Direction.SEND, messageSent, true));
-
     }
 
-    private void sendXQueryToShards() throws Exception {
-        ConnectionFactory factory = MessageBrokerConnectionFactory.messageBroker(messageBrokerHost);
+    private Vector<Message> shardResponses(Session session, BytesMessage xqueryMessage) throws Exception {
+        MessageConsumer messageConsumer = session.createConsumer(xqueryMessage.getJMSReplyTo());
 
-        Connection connection = factory.createConnection("admin", "admin");
-        connection.start();
+//        synchronized (this) {
+//            logger.debug(MessageFormat.format("{0}: shardResponses.START", correlationId));
+//        }
 
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
-        Destination sizeDestination = session.createTopic("xqa.shard.xquery");
-        Destination sizeReplyToDestination = session.createTemporaryQueue();
+        Vector<Message> xqueryResponsesFromShards = new Vector<>();
+        try {
+            Thread.sleep(4000);
+//
+//            Message sizeResponse = messageConsumer.receive(60000);
+//            while (sizeResponse != null) {
+//                synchronized (this) {
+//                    logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, sizeResponse, false));
+//                    xqueryResponsesFromShards.add(sizeResponse);
+//                }
+//                sizeResponse = messageConsumer.receive(5000);
+//            }
 
-        sendXQueryRequest(session, sizeDestination, sizeReplyToDestination);
+//        synchronized (this) {
+//            logger.debug(MessageFormat.format("{0}: shardResponses.END; xqueryResponsesFromShards={1}",
+//                    correlationId, xqueryResponsesFromShards.size()));
+//
+//            if (xqueryResponsesFromShards.size() == 0) {
+//                logger.warn(MessageFormat.format("{0}: xqueryResponsesFromShards={1}; subject={2}",
+//                        correlationId,
+//                        xqueryResponsesFromShards.size(),
+//                        xqueryRequestMessage.getJMSType()));
+//            }
+//        }
 
-        shardResponses(session, sizeReplyToDestination);
+            messageConsumer.close();
+        }
+        catch (Exception e) {
+            logger.error(e.getMessage());
+        }
 
-        session.close();
-        connection.close();
+        return xqueryResponsesFromShards;
     }
 
-    private void shardResponses(Session session, Destination sizeReplyToDestination) throws Exception {
-        MessageConsumer messageConsumer = session.createConsumer(sizeReplyToDestination);
-
-        synchronized (this) {
-            logger.debug(MessageFormat.format("{0}: shardResponses.START", xqueryRequestMessage.getJMSCorrelationID()));
-        }
-
-        Message sizeResponse = messageConsumer.receive(60000);
-        while (sizeResponse != null) {
-            synchronized (this) {
-                logger.debug(MessageLogging.log(MessageLogging.Direction.RECEIVE, sizeResponse, false));
-                xqueryResponsesFromShards.add(sizeResponse);
-            }
-            sizeResponse = messageConsumer.receive(5000);
-        }
-
-        synchronized (this) {
-            logger.debug(MessageFormat.format("{0}: shardResponses.END; xqueryResponsesFromShards={1}",
-                    xqueryRequestMessage.getJMSCorrelationID(), xqueryResponsesFromShards.size()));
-
-            if (xqueryResponsesFromShards.size() == 0) {
-                logger.warn(MessageFormat.format("{0}: xqueryResponsesFromShards={1}; subject={2}",
-                        xqueryRequestMessage.getJMSCorrelationID(),
-                        xqueryResponsesFromShards.size(),
-                        xqueryRequestMessage.getJMSType()));
-            }
-        }
-
-        messageConsumer.close();
-    }
-
-    private void sendXQueryRequest(Session session, Destination xqueryDestination, Destination sizeReplyToDestination)
+    private BytesMessage sendXQueryRequest(Session session,
+                                   String correlationId,
+                                   String body)
             throws Exception {
+        Destination xqueryDestination = session.createTopic(this.messageBrokerConfiguration.getXqueryDestination());
+
         MessageProducer messageProducer = session.createProducer(xqueryDestination);
-        BytesMessage sizeRequest;
+        BytesMessage xqueryMessage;
         synchronized (this) {
-            sizeRequest = MessageSender.constructMessage(session, xqueryDestination, xqueryRequestMessage.getJMSCorrelationID(),
-                    sizeReplyToDestination, null, null);
-            logger.debug(MessageLogging.log(MessageLogging.Direction.SEND, sizeRequest, false));
+            xqueryMessage = MessageSender.constructMessage(
+                    session,
+                    xqueryDestination,
+                    correlationId,
+                    session.createTemporaryQueue(),
+                    null,
+                    body);
+            logger.debug(MessageLogging.log(MessageLogging.Direction.SEND, xqueryMessage, false));
         }
-        messageProducer.send(sizeRequest, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
+        messageProducer.send(xqueryMessage, DeliveryMode.NON_PERSISTENT, Message.DEFAULT_PRIORITY, Message.DEFAULT_TIME_TO_LIVE);
         messageProducer.close();
+
+        return xqueryMessage;
     }
 }

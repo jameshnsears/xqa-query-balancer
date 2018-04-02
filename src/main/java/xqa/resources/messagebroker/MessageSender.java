@@ -25,7 +25,7 @@ public class MessageSender {
                 if (retryAttempts == 0) {
                     throw exception;
                 }
-                retryAttempts --;
+                retryAttempts--;
                 Thread.sleep(5000);
             }
         }
@@ -58,12 +58,12 @@ public class MessageSender {
     }
 
     public BytesMessage sendMessage(DestinationType destinationType,
-                            String destinationName,
-                            String correlationID,
-                            Destination replyTo,
-                            String subject,
-                            String body,
-                            int deliveryMode) throws Exception {
+                                    String destinationName,
+                                    String correlationID,
+                                    Destination replyTo,
+                                    String subject,
+                                    String body,
+                                    int deliveryMode) throws Exception {
         Destination destination;
         if (destinationType == DestinationType.Queue) {
             destination = session.createQueue(destinationName);
@@ -81,27 +81,6 @@ public class MessageSender {
         return message;
     }
 
-    public void sendReplyMessage(Destination destination,
-                                 String correlationID,
-                                 Destination replyTo,
-                                 String body,
-                                 int deliveryMode) throws Exception {
-        connection.start();
-
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-        MessageProducer messageProducer = session.createProducer(null);
-
-        BytesMessage replyMessage = constructMessage(session, destination, correlationID, replyTo, null, body);
-        logger.debug(MessageLogging.log(MessageLogging.Direction.SEND, replyMessage, false));
-
-        messageProducer.send(destination, replyMessage, deliveryMode, Message.DEFAULT_PRIORITY,
-                Message.DEFAULT_TIME_TO_LIVE);
-
-        messageProducer.close();
-        session.close();
-        connection.close();
-    }
 
     public void close() throws Exception {
         session.close();

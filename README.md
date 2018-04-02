@@ -13,7 +13,7 @@
 * docker-compose -p "dev" build --force-rm
 
 ## 2. Bring up
-* docker-compose -p "dev" up -d
+* docker-compose -p "dev" up -d xqa-db xqa-message-broker
 
 ## 3. Test
 
