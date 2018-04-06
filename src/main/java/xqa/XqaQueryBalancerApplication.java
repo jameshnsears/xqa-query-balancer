@@ -40,7 +40,7 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
     }
 
     @Override
-    public void run(XqaQueryBalancerConfiguration configuration, Environment environment) {
+    public void run(XqaQueryBalancerConfiguration configuration, Environment environment) throws Exception {
         environment.healthChecks().register("QueryBalancerHealthCheck", new QueryBalancerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();

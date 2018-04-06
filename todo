@@ -1,8 +1,10 @@
-carry on XQueryTest
+force all jms dependencies out of main project and into module
+= clear seperation of concerns
 
-use Executors.newCachedThreadPool();?
+refactor out into properties/configuration file:
+        env.put("connectionfactory.url.amqp", "amqp://" + messageBrokerHost + ":5672/");
 
-pass in a param for xqa-message-broker
+incorporate synchorinization calls
 
 https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/
 = for observing testing

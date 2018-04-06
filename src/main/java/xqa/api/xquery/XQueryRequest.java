@@ -15,7 +15,7 @@ public class XQueryRequest {
     }
 
     @JsonProperty
-    public String getXqueryRequest() {
+    public String getXQueryRequest() {
         return xqueryRequest;
     }
 

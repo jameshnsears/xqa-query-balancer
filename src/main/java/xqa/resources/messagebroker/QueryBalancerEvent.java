@@ -9,15 +9,16 @@ public class QueryBalancerEvent {
     private long creationTime = 0;
     private String correlationId = "";
     private String digest = "";
-    private String state = "";
+    private State state;
 
-    public QueryBalancerEvent() { }
+    public QueryBalancerEvent() {
         // Jackson deserialization
+    }
 
     public QueryBalancerEvent(final String serviceId,
                               final String correlationId,
                               final String digest,
-                              final String state) {
+                              final QueryBalancerEvent.State state) {
         this.serviceId = serviceId;
         this.creationTime = new Date().getTime();
         this.correlationId = correlationId;
@@ -46,7 +47,14 @@ public class QueryBalancerEvent {
     }
 
     @JsonProperty
-    public String getState() {
+    public QueryBalancerEvent.State getState() {
         return state;
+    }
+
+    public enum State {
+        @JsonProperty("START")
+        START,
+        @JsonProperty("END")
+        END
     }
 }

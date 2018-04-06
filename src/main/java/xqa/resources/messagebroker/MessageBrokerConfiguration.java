@@ -8,10 +8,16 @@ public class MessageBrokerConfiguration {
     private String host;
 
     @NotEmpty
+    private int port;
+
+    @NotEmpty
     private String userName;
 
     @NotEmpty
     private String password;
+
+    @NotEmpty
+    private int retryAttempts;
 
     @NotEmpty
     private String xqueryDestination;
@@ -67,5 +73,25 @@ public class MessageBrokerConfiguration {
     @JsonProperty
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @JsonProperty
+    public int getRetryAttempts() {
+        return retryAttempts;
+    }
+
+    @JsonProperty
+    public void setRetryAttempts(int retryAttempts) {
+        this.retryAttempts = retryAttempts;
+    }
+
+    @JsonProperty
+    public int getPort() {
+        return port;
+    }
+
+    @JsonProperty
+    public void setPort(int port) {
+        this.port = port;
     }
 }

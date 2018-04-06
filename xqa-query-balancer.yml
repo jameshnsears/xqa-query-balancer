@@ -31,7 +31,9 @@ logging:
 
 messageBroker:
   host: xqa-message-broker
+  port: 5672
   userName: admin
   password: admin
+  retryAttempts: 3
   xqueryDestination: xqa.shard.xquery
   auditDestination: xqa.db.amqp.insert_event
