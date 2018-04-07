@@ -1,19 +1,17 @@
 package xqa.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
-import xqa.qpid.jms.MessageBroker;
-import xqa.qpid.jms.MessageMaker;
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 import xqa.resources.messagebroker.QueryBalancerEvent;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TemporaryQueue;
 import javax.validation.Valid;
@@ -21,7 +19,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,13 +30,10 @@ public class XQueryResource {
     private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
 
     private final String serviceId;
-
+    private TemporaryQueue shardReplyToQueue;
     private MessageBroker messageBroker;
-
     private String auditDestination;
     private String xqueryDestination;
-
-    TemporaryQueue shardReplyToQueue;
 
     public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId) throws Exception {
         synchronized (this) {
@@ -90,7 +84,7 @@ public class XQueryResource {
         QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(
                 serviceId,
                 correlationId,
-                DigestUtils.sha256Hex(xquery.toString()),
+                DigestUtils.sha256Hex(xquery),
                 eventState);
 
         ObjectMapper mapper = new ObjectMapper();

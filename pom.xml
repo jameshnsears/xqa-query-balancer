@@ -49,21 +49,19 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.qpid</groupId>
-			<artifactId>qpid-jms-client</artifactId>
-			<version>0.31.0</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.jameshnsears</groupId>
 			<artifactId>xqa-commons-qpid-jms</artifactId>
 			<version>1.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.11</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

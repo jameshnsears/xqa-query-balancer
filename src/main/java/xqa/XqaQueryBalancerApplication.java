@@ -17,7 +17,7 @@ import java.util.UUID;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
     private static final Logger logger = LoggerFactory.getLogger(SearchResource.class);
-    private String serviceId;
+    private final String serviceId;
 
     public XqaQueryBalancerApplication() {
         serviceId = this.getClass().getSimpleName().toLowerCase() + "/" + UUID.randomUUID().toString().split("-")[0];

@@ -14,7 +14,7 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 
-public class DatabaseFixture {
+class DatabaseFixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
     private String getResource() {
