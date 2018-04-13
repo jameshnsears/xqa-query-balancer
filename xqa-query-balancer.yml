@@ -36,4 +36,4 @@ messageBroker:
   password: admin
   retryAttempts: 3
   xqueryDestination: xqa.shard.xquery
-  auditDestination: xqa.db.amqp.insert_event
+  auditDestination: xqa.event
