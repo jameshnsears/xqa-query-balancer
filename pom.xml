@@ -8,7 +8,6 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<name>xqa-query-balancer</name>
 	<url>http://github.com/jameshnsears/xqa-query-balancer</url>
-	<packaging>pom</packaging>
 
 	<properties>
 		<java.version>1.8</java.version>
