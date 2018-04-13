@@ -5,9 +5,9 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class SearchResponse {
-  private final List<SearchResult> searchResult = Lists.newArrayList();
+    private final List<SearchResult> searchResult = Lists.newArrayList();
 
-  public List<SearchResult> getSearchResponse() {
-    return this.searchResult;
-  }
+    public List<SearchResult> getSearchResponse() {
+        return this.searchResult;
+    }
 }
