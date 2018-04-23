@@ -20,15 +20,15 @@ services:
     networks:
       - xqa
 
-  xqa-query-balancer:
-    build: .
-    image: "xqa-query-balancer"
-    command: ["server", "xqa-query-balancer.yml"]
-    depends_on:
-      - xqa-db
-      - xqa-message-broker
+  xqa-shard:
+    image: jameshnsears/xqa-shard:latest
+    command: ["-message_broker_host", "xqa-message-broker"]
+    ports:
+      - "1984:1984"
     networks:
       - xqa
+    depends_on:
+      - xqa-message-broker
 
 volumes:
   xqa-db:

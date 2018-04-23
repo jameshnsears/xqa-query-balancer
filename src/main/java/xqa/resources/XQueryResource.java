@@ -106,14 +106,13 @@ public class XQueryResource {
                 messageBroker.getSession(),
                 messageBroker.getSession().createTopic(xqueryDestination),
                 shardReplyToQueue,
-                UUID.randomUUID().toString(),
-                xquery.toString());
+                correlationId,
+                xquery.getXQueryRequest());
 
         messageBroker.sendMessage(message);
     }
 
     private synchronized List<Message> collectShardXQueryResponses() throws Exception {
-         return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 2000);
+        return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 2000);
     }
-
 }

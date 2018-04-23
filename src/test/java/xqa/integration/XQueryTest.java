@@ -17,7 +17,6 @@ import xqa.integration.fixtures.ShardFixture;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +31,7 @@ public class XQueryTest extends ShardFixture {
 
     @Test
     public void xquery() throws Exception {
-        setupStorage();
+        setupStorage(application.getConfiguration());
 
         final XQueryResponse xqueryResponse = application.client()
                 .property(ClientProperties.READ_TIMEOUT, 6000)

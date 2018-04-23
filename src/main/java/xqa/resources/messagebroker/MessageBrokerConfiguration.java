@@ -23,6 +23,9 @@ public class MessageBrokerConfiguration {
     private String xqueryDestination;
 
     @NotEmpty
+    private String sizeDestination;
+
+    @NotEmpty
     private String auditDestination;
 
     @JsonProperty
@@ -93,5 +96,15 @@ public class MessageBrokerConfiguration {
     @JsonProperty
     public void setPort(int port) {
         this.port = port;
+    }
+
+    @JsonProperty
+    public String getSizeDestination() {
+        return sizeDestination;
+    }
+
+    @JsonProperty
+    public void setSizeDestination(String sizeDestination) {
+        this.sizeDestination = sizeDestination;
     }
 }

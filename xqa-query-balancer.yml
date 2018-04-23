@@ -30,10 +30,11 @@ logging:
       maxFileSize: 1mb
 
 messageBroker:
-  host: xqa-message-broker
+  host: 0.0.0.0
   port: 5672
   userName: admin
   password: admin
   retryAttempts: 3
   xqueryDestination: xqa.shard.xquery
+  sizeDestination: xqa.shard.size
   auditDestination: xqa.event

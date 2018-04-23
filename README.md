@@ -38,5 +38,10 @@ or
 * curl http://127.0.0.1:8081/healthcheck
 * curl http://127.0.0.1:8081/metrics
 
-### 4. Teardown
+## 4. Teardown
 * docker-compose -p "dev" down -v
+
+## 5. Empty BaseX Container database
+* basexclient -U admin -P admin
+* open xqa
+* delete /

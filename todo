@@ -1,3 +1,5 @@
+have it so that we ask for size & then with response queue do two inserts
+
 use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
 
 https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/

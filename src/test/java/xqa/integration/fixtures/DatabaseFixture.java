@@ -13,7 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
-public class DatabaseFixture implements Fixture {
+public class DatabaseFixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
     public String getResource() {
