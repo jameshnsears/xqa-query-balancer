@@ -1,0 +1,183 @@
+<chapter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" contentType="speech" xsi:noNamespaceSchemaLocation="V:\Production\Chatham_House\Schema\chapter.xsd">
+	<metadataInfo>
+		<PSMID>cho_meet_1943_0958_000_0000</PSMID>
+		<language ocr="English" primary="Yes">English</language>
+		<productContentType>Meetings</productContentType>
+		<contentDate>
+			<contentComposed>Tuesday, July 13th, 1943</contentComposed>
+			<contentDecade>1940-1949</contentDecade>
+			<contentYear>1943</contentYear>
+			<contentMonth>07</contentMonth>
+			<contentDay>13</contentDay>
+			<contentDateStart>1943-07-13</contentDateStart>
+			<contentDateEnd>1943-07-13</contentDateEnd>
+		</contentDate>
+		<chathamHouseRule>Yes</chathamHouseRule>
+		<ocr>80.94</ocr>
+		<sourceLibrary>
+			<libraryName>Chatham House</libraryName>
+			<libraryLocation>London, England</libraryLocation>
+			<copyrightStatement>Copyright Royal Institute of International Affairs</copyrightStatement>
+		</sourceLibrary>
+	</metadataInfo>
+	<citation>
+		<meeting>
+			<pubDate>
+				<composed>Tuesday, July 13th, 1943</composed>
+				<year>1943</year>
+				<month>07</month>
+				<day>13</day>
+				<dayofweek>Tuesday</dayofweek>
+				<pubDateStart>1943-07-13</pubDateStart>
+				<pubDateEnd>1943-07-13</pubDateEnd>
+			</pubDate>
+			<author role="author" type="Yes">
+				<aucomposed>J. R. P. Maud C. B. E.</aucomposed>
+				<first>J.</first>
+				<middle>R. P.</middle>
+				<last>Maud</last>
+				<suffix>C. B. E.</suffix>
+			</author>
+			<titleGroup>
+				<fullTitle>The United Nations Conference on Food and Agriculture, Hot Springs, VA</fullTitle>
+			</titleGroup>
+			<meetingGroup>
+				<meetingNumber>8/958</meetingNumber>
+				<sponsoringOrganisation>Chatham House</sponsoringOrganisation>
+				<meetingLocation>Chatham House</meetingLocation>
+				<meetingType>Speech</meetingType>
+			</meetingGroup>
+			<totalPages>1</totalPages>
+		</meeting>
+	</citation>
+	<page id="1" type="body_page" firstPage="Yes">
+		<pageImage pageIndicator="single" width="3400" height="5600" type="jpeg" colorimage="color" pagePosition="stand_alone">cho_meet_1943_0958_000_0001</pageImage>
+		<article id="1" type="article" level="1">
+			<clip pgref="1" clipref="1"/>
+			<articleInfo>
+				<ocr>80.94</ocr>
+				<startingColumn>A</startingColumn>
+				<pageCount>1</pageCount>
+			</articleInfo>
+			<text>
+				<textclip>
+					<articlePage pgref="1" clipref="1">cho_meet_1943_0958_000_0001</articlePage>
+					<p>
+						<word pos="546,452,694,502">THE</word>
+						<word pos="764,452,1012,504">ROYAL</word>
+						<word pos="1082,454,1474,508">INSTITUTE</word>
+						<word pos="1544,460,1638,508">OF</word>
+						<word pos="1710,462,2316,512">INTERNATIONAL</word>
+						<word pos="2388,466,2686,516">AFFAIRS</word>
+						<word pos="724,582,990,634">Chatham</word>
+						<word pos="1036,586,1226,648">House,</word>
+						<word pos="1282,604,1352,650">10,</word>
+						<word pos="1402,588,1478,640">St.</word>
+						<word pos="1512,590,1736,654">James's</word>
+						<word pos="1786,586,2000,656">Square,</word>
+						<word pos="2052,594,2290,656">London,</word>
+						<word pos="2340,596,2504,648">S.W.i</word>
+						<word pos="1382,1198,1438,1244">a</word>
+						<word pos="1488,1198,1606,1244">Ti&#163;j</word>
+						<word pos="1652,1200,1928,1250">xsqusst</word>
+						<word pos="1968,1200,2052,1248">eg</word>
+						<word pos="2096,1202,2194,1250">tie</word>
+						<word pos="1686,1298,2052,1348">M02SCC2D</word>
+						<word pos="2092,1300,2232,1350">gar:</word>
+						<word pos="2078,1078,2192,1126">WOT</word>
+						<word pos="2240,1078,2318,1126">TO</word>
+						<word pos="2360,1078,2438,1128">BE</word>
+						<word pos="2484,1080,2686,1130">TAKSIf</word>
+						<word pos="2722,1080,2886,1132">Aii'AY</word>
+						<word pos="1078,1672,1318,1722">RECORD</word>
+						<word pos="1407,1672,1479,1719">OP</word>
+						<word pos="1565,1671,1845,1719">ES2IIG</word>
+						<word pos="1931,1670,2087,1719">HEH)</word>
+						<word pos="1329,2074,1614,2122">CHATHAM</word>
+						<word pos="1694,2072,1890,2120">HOUSE</word>
+						<word pos="2436,2192,2472,2380">1</word>
+						<word pos="1575,2338,1657,2384">OIT</word>
+						<word pos="1395,2454,1707,2512">Tuesday,</word>
+						<word pos="1313,2583,1473,2642">July</word>
+						<word pos="1515,2584,1707,2647">13th,</word>
+						<word pos="1761,2582,1947,2642">1943.</word>
+						<word pos="1391,2668,1875,2718">CQNj1IDiffTTI,-4L</word>
+						<word pos="490,2740,793,2803">Subjects</word>
+						<word pos="947,2764,1065,2810">TIE</word>
+						<word pos="1108,2764,1349,2814">UNITED</word>
+						<word pos="1390,2767,1670,2816">NATIONS</word>
+						<word pos="1717,2771,2117,2819">CONFERENCE</word>
+						<word pos="2159,2775,2238,2822">ON</word>
+						<word pos="2281,2775,2439,2822">FOOD</word>
+						<word pos="2483,2777,2601,2826">AND</word>
+						<word pos="945,2827,1419,2888">AGRICULTURE9</word>
+						<word pos="1470,2834,1587,2882">HOT</word>
+						<word pos="1635,2836,1947,2891">SPRINGS,</word>
+						<word pos="1995,2838,2102,2886">VA.</word>
+						<word pos="492,3076,798,3136">Speaker:</word>
+						<word pos="944,3094,1010,3140">j.</word>
+						<word pos="1066,3094,1130,3144">g.</word>
+						<word pos="1188,3094,1254,3142">p.</word>
+						<word pos="1308,3096,1500,3154">maud,</word>
+						<word pos="1552,3098,1780,3150">c.B.S.</word>
+						<word pos="498,3410,846,3460">Chairman:</word>
+						<word pos="950,3424,1070,3470">the</word>
+						<word pos="1106,3424,1426,3476">VISCOUHT</word>
+						<word pos="1472,3430,1698,3480">ASTOH.</word>
+						<word pos="491,4147,769,4196">Members</word>
+						<word pos="815,4158,929,4195">are</word>
+						<word pos="977,4147,1296,4194">reminded</word>
+						<word pos="1342,4146,1497,4191">that</word>
+						<word pos="1549,4146,1623,4192">in</word>
+						<word pos="1667,4156,1784,4204">any</word>
+						<word pos="1830,4154,1939,4190">use</word>
+						<word pos="1986,4144,2142,4191">made</word>
+						<word pos="2198,4143,2269,4190">of</word>
+						<word pos="2319,4143,2759,4191">information</word>
+						<word pos="2799,4140,3120,4190">received</word>
+						<word pos="495,4215,569,4263">at</word>
+						<word pos="617,4226,731,4273">any</word>
+						<word pos="777,4213,1054,4271">meeting</word>
+						<word pos="1107,4211,1177,4258">of</word>
+						<word pos="1222,4212,1334,4259">the</word>
+						<word pos="1391,4211,1741,4258">Institute</word>
+						<word pos="1790,4208,1902,4254">the</word>
+						<word pos="1953,4207,2307,4266">speaker's</word>
+						<word pos="2355,4219,2509,4255">name</word>
+						<word pos="2563,4206,2757,4255">shall</word>
+						<word pos="2801,4208,2917,4255">not</word>
+						<word pos="2963,4206,3038,4254">be</word>
+						<word pos="499,4283,734,4342">quoted</word>
+						<word pos="777,4290,895,4328">nor</word>
+						<word pos="939,4280,1051,4326">the</word>
+						<word pos="1103,4278,1257,4326">fact</word>
+						<word pos="1299,4278,1666,4326">mentioned</word>
+						<word pos="1710,4275,1865,4324">that</word>
+						<word pos="1911,4274,2023,4322">the</word>
+						<word pos="2078,4274,2515,4322">information</word>
+						<word pos="2554,4284,2674,4322">was</word>
+						<word pos="2726,4272,3041,4322">obtained</word>
+						<word pos="497,4348,570,4394">at</word>
+						<word pos="618,4362,653,4395">a</word>
+						<word pos="694,4346,978,4404">meeting</word>
+						<word pos="1027,4346,1097,4391">of</word>
+						<word pos="1143,4344,1255,4391">the</word>
+						<word pos="1313,4342,1701,4392">Institute.</word>
+						<word pos="578,4550,770,4596">These</word>
+						<word pos="823,4547,1219,4594">conditions</word>
+						<word pos="1266,4544,1463,4600">apply</word>
+						<word pos="1511,4543,1785,4600">equally</word>
+						<word pos="1831,4543,1909,4587">to</word>
+						<word pos="1958,4543,2395,4590">information</word>
+						<word pos="2445,4543,2761,4590">obtained</word>
+						<word pos="2805,4542,2965,4590">from</word>
+						<word pos="1262,4680,1547,4727">written</word>
+						<word pos="1589,4678,1865,4726">records</word>
+						<word pos="1918,4676,1987,4723">of</word>
+						<word pos="2030,4676,2386,4731">meetings*</word>
+					</p>
+				</textclip>
+			</text>
+		</article>
+	</page>
+</chapter>

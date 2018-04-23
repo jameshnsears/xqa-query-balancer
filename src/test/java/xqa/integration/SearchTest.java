@@ -10,6 +10,7 @@ import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
+import xqa.integration.fixtures.DatabaseFixture;
 
 import javax.ws.rs.BadRequestException;
 
@@ -27,7 +28,7 @@ public class SearchTest extends DatabaseFixture {
 
     @Test
     public void search() throws Exception {
-        setupDatabase();
+        setupStorage();
 
         final SearchResponse searchResponse = application.client()
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/search/d6f04c9881").request()
@@ -49,7 +50,7 @@ public class SearchTest extends DatabaseFixture {
 
     @Test
     public void searchWithSlash() throws Exception {
-        setupDatabase();
+        setupStorage();
 
         final SearchResponse searchResponse = application.client()
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/search/shard/e540188c")

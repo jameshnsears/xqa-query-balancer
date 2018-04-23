@@ -1,15 +1,10 @@
-force all jms dependencies out of main project and into module
-= clear seperation of concerns
-
-refactor out into properties/configuration file:
-        env.put("connectionfactory.url.amqp", "amqp://" + messageBrokerHost + ":5672/");
-
-incorporate synchorinization calls
+use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
 
 https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/
 = for observing testing
 
-jmeter for testing?
+jmeter for testing
+= for memory leaks
 
 test xquery with multiple concurrent requests
 = for threading issues.

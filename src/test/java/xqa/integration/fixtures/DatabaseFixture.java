@@ -1,4 +1,4 @@
-package xqa.integration;
+package xqa.integration.fixtures;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +13,15 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
-class DatabaseFixture {
+public class DatabaseFixture implements Fixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
-    private String getResource() {
+    public String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("populate-database")
                 .getPath();
     }
 
-    void setupDatabase() throws Exception {
+    public void setupStorage() throws Exception {
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection("jdbc:postgresql://0.0.0.0:5432/xqa", "xqa",
                 "xqa");
