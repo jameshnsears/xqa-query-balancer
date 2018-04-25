@@ -1,4 +1,4 @@
-have it so that we ask for size & then with response queue do two inserts
+xquery, count(/) against 2 shards with 4 inserts
 
 use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
 

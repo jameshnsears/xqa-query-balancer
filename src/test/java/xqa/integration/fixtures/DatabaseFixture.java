@@ -17,7 +17,7 @@ public class DatabaseFixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
     public String getResource() {
-        return Thread.currentThread().getContextClassLoader().getResource("populate-database")
+        return Thread.currentThread().getContextClassLoader().getResource("database")
                 .getPath();
     }
 

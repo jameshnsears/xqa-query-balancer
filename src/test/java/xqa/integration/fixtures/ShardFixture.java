@@ -8,7 +8,6 @@ import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 
-import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TemporaryQueue;
@@ -28,7 +27,7 @@ public class ShardFixture {
     private MessageBroker messageBroker;
 
     public String getResource() {
-        return Thread.currentThread().getContextClassLoader().getResource("populate-shard")
+        return Thread.currentThread().getContextClassLoader().getResource("shard")
                 .getPath();
     }
 
