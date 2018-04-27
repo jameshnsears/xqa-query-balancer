@@ -34,14 +34,15 @@ public class XQueryTest extends ShardFixture {
         setupStorage(application.getConfiguration());
 
         final XQueryResponse xqueryResponse = application.client()
-                .property(ClientProperties.READ_TIMEOUT, 6000)
+                .property(ClientProperties.READ_TIMEOUT, 10000)
                 .target("http://0.0.0.0:" + application.getLocalPort() + "/xquery")
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("count(/)")))
                 .readEntity(XQueryResponse.class);
 
-        final String expected = objectMapper.writeValueAsString(
-                objectMapper.readValue(fixture("fixtures/xquery.json"), XQueryResponse.class));
+        // https://regex101.com/
+        String regExMatcher = "\\\"<xqueryResponse>\\\\n<shard id='[a-zA-Z0-9]{8}'>\\\\n[0-9]{1,2}\\\\n<\\/shard>\\\\n<shard id='[a-zA-Z0-9]{8}'>\\\\n[0-9]{1,2}\\\\n<\\/shard>\\\\n<\\/xqueryResponse>\\\"";
 
-        assertThat(objectMapper.writeValueAsString(xqueryResponse)).isEqualTo(expected);
+        System.out.println(objectMapper.writeValueAsString(xqueryResponse.getXqueryResponse()));
+        assertThat(objectMapper.writeValueAsString(xqueryResponse.getXqueryResponse())).matches(regExMatcher);
     }
 }

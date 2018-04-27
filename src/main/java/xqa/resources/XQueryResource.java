@@ -12,6 +12,7 @@ import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 import xqa.resources.messagebroker.QueryBalancerEvent;
 
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.TemporaryQueue;
 import javax.validation.Valid;
@@ -19,6 +20,8 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,6 +59,7 @@ public class XQueryResource {
         }
 
         logger.info(xquery.toString());
+        List<Message> shardXQueryResponses = null;
 
         try {
             String correlationId = UUID.randomUUID().toString();
@@ -64,9 +68,7 @@ public class XQueryResource {
 
             sendXQueryToShards(xquery, correlationId);
 
-            List<Message> shardXQueryResponses = collectShardXQueryResponses();
-
-            // TODO materialise the response(s)
+            shardXQueryResponses = collectShardXQueryResponses();
 
             sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
         } catch (Exception exception) {
@@ -79,7 +81,7 @@ public class XQueryResource {
             }
         }
 
-        return new XQueryResponse("<some xquery response/>"); // json out
+        return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }
 
     private synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
@@ -113,6 +115,15 @@ public class XQueryResource {
     }
 
     private synchronized List<Message> collectShardXQueryResponses() throws Exception {
-        return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 2000);
+        return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 60000);
+    }
+
+    private synchronized String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
+            throws UnsupportedEncodingException, JMSException {
+        String response = "<xqueryResponse>\n";
+        for (Message message: shardXQueryResponses) {
+            response += MessageMaker.getBody(message) + "\n";
+        }
+        return response += "</xqueryResponse>";
     }
 }

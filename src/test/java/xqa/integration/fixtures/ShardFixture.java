@@ -8,16 +8,12 @@ import xqa.commons.qpid.jms.MessageBroker;
 import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 
-import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.TemporaryQueue;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -38,30 +34,22 @@ public class ShardFixture {
                 messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
                 messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
 
-        populate(findInsertDestination());
+        populateShards();
+        waitForDataToGetInsertedIntoShards();
 
         messageBroker.close();
     }
 
-    private String findInsertDestination() throws JMSException, UnsupportedEncodingException {
-        TemporaryQueue replyTo = messageBroker.createTemporaryQueue();
-
-        messageBroker.sendMessage(MessageMaker.createMessage(messageBroker.getSession(),
-                messageBroker.getSession().createTopic(messageBrokerConfiguration.getSizeDestination()),
-                replyTo,
-                UUID.randomUUID().toString(),
-                ""));
-
-        List<Message> messages = messageBroker.receiveMessagesTemporaryQueue(replyTo, 2000);
-        return messages.get(0).getJMSReplyTo().toString();
+    private void waitForDataToGetInsertedIntoShards() throws InterruptedException {
+        Thread.sleep(10000);
     }
 
-    private void populate(String insertDestination) throws IOException {
+    private void populateShards() throws IOException {
         try (Stream<Path> filePathStream = Files.walk(Paths.get(getResource()))) {
             filePathStream.forEach(filePath -> {
                 if (Files.isRegularFile(filePath)) {
                     try {
-                        insertFileContentsIntoShard(insertDestination, filePath);
+                        insertFileContentsIntoShard(filePath);
                     } catch (Exception exception) {
                         logger.error(exception.getMessage());
                     }
@@ -70,10 +58,10 @@ public class ShardFixture {
         }
     }
 
-    private void insertFileContentsIntoShard(String insertDestination, Path filePath) throws Exception {
+    private void insertFileContentsIntoShard(Path filePath) throws Exception {
         Message message = MessageMaker.createMessage(
                 messageBroker.getSession(),
-                messageBroker.getSession().createQueue(insertDestination),
+                messageBroker.getSession().createQueue(messageBrokerConfiguration.getIngestDestination()),
                 UUID.randomUUID().toString(),
                 filePath.toString(),
                 FileUtils.readFileToString(filePath.toFile(), StandardCharsets.UTF_8));

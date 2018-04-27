@@ -36,5 +36,5 @@ messageBroker:
   password: admin
   retryAttempts: 3
   xqueryDestination: xqa.shard.xquery
-  sizeDestination: xqa.shard.size
+  ingestDestination: xqa.ingest
   auditDestination: xqa.event

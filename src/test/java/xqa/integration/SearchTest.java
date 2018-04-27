@@ -35,7 +35,7 @@ public class SearchTest extends DatabaseFixture {
                 .get(SearchResponse.class);
 
         final String expected = objectMapper.writeValueAsString(
-                objectMapper.readValue(fixture("fixtures/search.json"), SearchResult[].class));
+                objectMapper.readValue(fixture("response/search.json"), SearchResult[].class));
 
         assertThat(objectMapper.writeValueAsString(searchResponse.getSearchResponse()))
                 .isEqualTo(expected);

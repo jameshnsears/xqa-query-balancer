@@ -20,11 +20,17 @@ services:
     networks:
       - xqa
 
+  xqa-ingest-balancer:
+    image: jameshnsears/xqa-ingest-balancer:latest
+    command: ["-message_broker_host", "xqa-message-broker", "-pool_size", "2"]
+    networks:
+      - xqa
+    depends_on:
+      - xqa-message-broker
+
   xqa-shard:
     image: jameshnsears/xqa-shard:latest
     command: ["-message_broker_host", "xqa-message-broker"]
-    ports:
-      - "1984:1984"
     networks:
       - xqa
     depends_on:

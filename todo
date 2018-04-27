@@ -1,4 +1,6 @@
-xquery, count(/) against 2 shards with 4 inserts
+replace xquery magic timeout values with configuration values
+
+--
 
 use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
 

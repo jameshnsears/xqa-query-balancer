@@ -20,7 +20,8 @@ before_script:
   - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
 
 script:
-  - docker-compose -p "dev" up -d xqa-shard xqa-db xqa-message-broker
+  - docker-compose -p "dev" up -d xqa-db xqa-message-broker xqa-ingest-balancer
+  - docker-compose -p "dev" up -d --scale xqa-shard=2
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
   - mvn clean test
 

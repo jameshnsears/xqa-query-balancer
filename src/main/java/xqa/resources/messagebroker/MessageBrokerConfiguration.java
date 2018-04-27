@@ -23,7 +23,7 @@ public class MessageBrokerConfiguration {
     private String xqueryDestination;
 
     @NotEmpty
-    private String sizeDestination;
+    private String ingestDestination;
 
     @NotEmpty
     private String auditDestination;
@@ -99,12 +99,12 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public String getSizeDestination() {
-        return sizeDestination;
+    public String getIngestDestination() {
+        return ingestDestination;
     }
 
     @JsonProperty
-    public void setSizeDestination(String sizeDestination) {
-        this.sizeDestination = sizeDestination;
+    public void setIngestDestination(String ingestDestination) {
+        this.ingestDestination = ingestDestination;
     }
 }
