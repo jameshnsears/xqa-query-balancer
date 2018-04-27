@@ -2,12 +2,7 @@ package xqa.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
-import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import org.junit.ClassRule;
 import org.junit.Test;
-import xqa.XqaQueryBalancerApplication;
-import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
 import xqa.integration.fixtures.DatabaseFixture;
@@ -20,10 +15,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 
 public class SearchTest extends DatabaseFixture {
-    @ClassRule
-    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
-            XqaQueryBalancerApplication.class,
-            ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
     @Test

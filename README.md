@@ -13,7 +13,8 @@
 * docker-compose -p "dev" build --force-rm
 
 ## 2. Bring up
-* docker-compose -p "dev" up -d xqa-db xqa-message-broker
+* docker-compose -p "dev" up -d xqa-db xqa-message-broker xqa-ingest-balancer
+* docker-compose -p "dev" up -d --scale xqa-shard=2
 
 ## 3. Test
 
@@ -30,7 +31,7 @@ or
 * docker-compose -p "dev" up -d
 
 #### 3.2.1. Endpoints
-* curl http://127.0.0.1:8080/search/shard/1234
+* curl http://127.0.0.1:8080/search/shard/a510ab7f
 * curl http://127.0.0.1:8080/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
 * curl -X POST http://127.0.0.1:8081/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"

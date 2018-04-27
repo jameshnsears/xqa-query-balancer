@@ -1,7 +1,3 @@
-replace xquery magic timeout values with configuration values
-
-use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
-
 https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/
 = for observing testing
 

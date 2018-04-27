@@ -1,7 +1,12 @@
 package xqa.integration.fixtures;
 
+import io.dropwizard.testing.ResourceHelpers;
+import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.junit.ClassRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xqa.XqaQueryBalancerApplication;
+import xqa.XqaQueryBalancerConfiguration;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +20,10 @@ import java.util.stream.Stream;
 
 public class DatabaseFixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
+    @ClassRule
+    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+            XqaQueryBalancerApplication.class,
+            ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
     private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("database")
@@ -22,9 +31,11 @@ public class DatabaseFixture {
     }
 
     protected void setupStorage() throws Exception {
-        Class.forName("org.postgresql.Driver");
-        Connection connection = DriverManager.getConnection("jdbc:postgresql://0.0.0.0:5432/xqa", "xqa",
-                "xqa");
+        Class.forName(application.getConfiguration().getDataSourceFactory().getDriverClass());
+        Connection connection = DriverManager.getConnection(
+                application.getConfiguration().getDataSourceFactory().getUrl(),
+                application.getConfiguration().getDataSourceFactory().getUser(),
+                application.getConfiguration().getDataSourceFactory().getPassword());
         truncate(connection);
         populate(connection);
         connection.close();
