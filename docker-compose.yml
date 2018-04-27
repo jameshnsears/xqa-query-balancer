@@ -1,6 +1,15 @@
 version: '3'
 
 services:
+  xqa-query-balancer:
+    build: .
+    image: "xqa-query-balancer"
+    depends_on:
+      - xqa-db
+      - xqa-message-broker
+    networks:
+      - xqa
+
   xqa-db:
     image: jameshnsears/xqa-db:latest
     volumes:
