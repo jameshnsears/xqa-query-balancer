@@ -4,11 +4,11 @@ services:
   xqa-query-balancer:
     build: .
     image: "xqa-query-balancer"
+    networks:
+      - xqa
     depends_on:
       - xqa-db
       - xqa-message-broker
-    networks:
-      - xqa
 
   xqa-db:
     image: jameshnsears/xqa-db:latest
