@@ -1,7 +1,5 @@
 replace xquery magic timeout values with configuration values
 
---
-
 use xqa-query-balancer.yml values in DatabaseFixture.setupStorage
 
 https://docs.oracle.com/javase/8/docs/technotes/guides/visualvm/
@@ -14,20 +12,14 @@ test xquery with multiple concurrent requests
 = for threading issues.
 = using multiple shards
 
-run static analysis
-
 health check for connectivity to the database
 = what is its url?
+= TemplateHealthCheck
 
 in xqa-ui
 = specify a timeout on the requests?
 
 have a /tasks/my_task to gracefully shutdown the app
-
++
 https://stackoverflow.com/questions/31288721/dropwizard-shutdown-hook
 http://www.dropwizard.io/1.2.2/docs/manual/core.html#tasks
-
-have a proper health check - tests that amqp server reachable?
-= TemplateHealthCheck
-
-https://stackoverflow.com/questions/48525748/socketexception-connection-reset-client-jersey-2-0-java-7

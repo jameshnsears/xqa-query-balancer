@@ -19,15 +19,15 @@ import java.util.stream.Stream;
 
 public class ShardFixture {
     private static final Logger logger = LoggerFactory.getLogger(ShardFixture.class);
-    MessageBrokerConfiguration messageBrokerConfiguration;
+    private MessageBrokerConfiguration messageBrokerConfiguration;
     private MessageBroker messageBroker;
 
-    public String getResource() {
+    private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("shard")
                 .getPath();
     }
 
-    public void setupStorage(XqaQueryBalancerConfiguration configuration) throws Exception {
+    protected void setupStorage(XqaQueryBalancerConfiguration configuration) throws Exception {
         messageBrokerConfiguration = configuration.getMessageBrokerConfiguration();
 
         messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),

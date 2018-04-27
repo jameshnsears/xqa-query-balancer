@@ -16,12 +16,12 @@ import java.util.stream.Stream;
 public class DatabaseFixture {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
-    public String getResource() {
+    private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("database")
                 .getPath();
     }
 
-    public void setupStorage() throws Exception {
+    protected void setupStorage() throws Exception {
         Class.forName("org.postgresql.Driver");
         Connection connection = DriverManager.getConnection("jdbc:postgresql://0.0.0.0:5432/xqa", "xqa",
                 "xqa");

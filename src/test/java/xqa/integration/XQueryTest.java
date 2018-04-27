@@ -18,7 +18,6 @@ import xqa.integration.fixtures.ShardFixture;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 
-import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class XQueryTest extends ShardFixture {

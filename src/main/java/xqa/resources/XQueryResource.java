@@ -21,7 +21,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -118,12 +117,12 @@ public class XQueryResource {
         return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 60000);
     }
 
-    private synchronized String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
+    private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
             throws UnsupportedEncodingException, JMSException {
-        String response = "<xqueryResponse>\n";
+        StringBuilder response = new StringBuilder("<xqueryResponse>\n");
         for (Message message: shardXQueryResponses) {
-            response += MessageMaker.getBody(message) + "\n";
+            response.append(MessageMaker.getBody(message)).append("\n");
         }
-        return response += "</xqueryResponse>";
+        return response.append("</xqueryResponse>").toString();
     }
 }
