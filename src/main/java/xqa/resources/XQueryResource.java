@@ -35,6 +35,8 @@ public class XQueryResource {
     private MessageBroker messageBroker;
     private String auditDestination;
     private String xqueryDestination;
+    private int shardResponseTimeout;
+    private int shardResponseSecondaryTimeout;
 
     public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId)
             throws Exception {
@@ -47,6 +49,9 @@ public class XQueryResource {
 
             auditDestination = messageBrokerConfiguration.getAuditDestination();
             xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
+
+            shardResponseTimeout = messageBrokerConfiguration.getShardResponseTimeout();
+            shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
         }
     }
 
@@ -114,7 +119,10 @@ public class XQueryResource {
     }
 
     private synchronized List<Message> collectShardXQueryResponses() throws Exception {
-        return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, 60000);
+        return messageBroker.receiveMessagesTemporaryQueue(
+                shardReplyToQueue,
+                shardResponseTimeout,
+                shardResponseSecondaryTimeout);
     }
 
     private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)

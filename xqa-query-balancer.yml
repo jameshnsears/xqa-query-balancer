@@ -38,3 +38,5 @@ messageBroker:
   xqueryDestination: xqa.shard.xquery
   ingestDestination: xqa.ingest
   auditDestination: xqa.event
+  shardResponseTimeout: 60000
+  shardResponseSecondaryTimeout: 5000

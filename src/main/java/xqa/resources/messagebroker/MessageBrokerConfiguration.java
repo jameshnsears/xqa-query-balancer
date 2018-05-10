@@ -28,6 +28,12 @@ public class MessageBrokerConfiguration {
     @NotEmpty
     private String auditDestination;
 
+    @NotEmpty
+    private int shardResponseTimeout;
+
+    @NotEmpty
+    private int shardResponseSecondaryTimeout;
+
     @JsonProperty
     public String getHost() {
         return host;
@@ -106,5 +112,25 @@ public class MessageBrokerConfiguration {
     @JsonProperty
     public void setIngestDestination(String ingestDestination) {
         this.ingestDestination = ingestDestination;
+    }
+
+    @JsonProperty
+    public int getShardResponseTimeout() {
+        return shardResponseTimeout;
+    }
+
+    @JsonProperty
+    public void setShardResponseTimeout(int shardResponseTimeout) {
+        this.shardResponseTimeout = shardResponseTimeout;
+    }
+
+    @JsonProperty
+    public int getShardResponseSecondaryTimeout() {
+        return shardResponseSecondaryTimeout;
+    }
+
+    @JsonProperty
+    public void setShardResponseSecondaryTimeout(int shardResponseSecondaryTimeout) {
+        this.shardResponseSecondaryTimeout = shardResponseSecondaryTimeout;
     }
 }
