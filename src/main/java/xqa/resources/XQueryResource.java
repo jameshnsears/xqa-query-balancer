@@ -28,109 +28,109 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class XQueryResource {
-    private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
+  private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
 
-    private final String serviceId;
-    private TemporaryQueue shardReplyToQueue;
-    private MessageBroker messageBroker;
-    private String auditDestination;
-    private String xqueryDestination;
-    private int shardResponseTimeout;
-    private int shardResponseSecondaryTimeout;
+  private final String serviceId;
+  private TemporaryQueue shardReplyToQueue;
+  private MessageBroker messageBroker;
+  private String auditDestination;
+  private String xqueryDestination;
+  private int shardResponseTimeout;
+  private int shardResponseSecondaryTimeout;
 
-    public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId)
-            throws Exception {
-        synchronized (this) {
-            this.serviceId = serviceId;
+  public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId)
+      throws Exception {
+    synchronized (this) {
+      this.serviceId = serviceId;
 
-            messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
-                    messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
-                    messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
+      messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
+          messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
+          messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
 
-            auditDestination = messageBrokerConfiguration.getAuditDestination();
-            xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
+      auditDestination = messageBrokerConfiguration.getAuditDestination();
+      xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
 
-            shardResponseTimeout = messageBrokerConfiguration.getShardResponseTimeout();
-            shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
-        }
+      shardResponseTimeout = messageBrokerConfiguration.getShardResponseTimeout();
+      shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
+    }
+  }
+
+  @POST
+  @Timed
+  public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) throws Exception { // json in
+    if (xquery.getXQueryRequest().isEmpty()) {
+      throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
     }
 
-    @POST
-    @Timed
-    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) throws Exception { // json in
-        if (xquery.getXQueryRequest().isEmpty()) {
-            throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
-        }
+    logger.info(xquery.toString());
+    List<Message> shardXQueryResponses = null;
 
-        logger.info(xquery.toString());
-        List<Message> shardXQueryResponses = null;
+    try {
+      String correlationId = UUID.randomUUID().toString();
 
-        try {
-            String correlationId = UUID.randomUUID().toString();
+      sendAuditEvent(QueryBalancerEvent.State.START, correlationId, xquery.toString());
 
-            sendAuditEvent(QueryBalancerEvent.State.START, correlationId, xquery.toString());
+      sendXQueryToShards(xquery, correlationId);
 
-            sendXQueryToShards(xquery, correlationId);
+      shardXQueryResponses = collectShardXQueryResponses();
 
-            shardXQueryResponses = collectShardXQueryResponses();
-
-            sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
-        } catch (Exception exception) {
-            logger.error(exception.getMessage());
-            exception.printStackTrace();
-            System.exit(1);
-        } finally {
-            synchronized (this) {
-                messageBroker.close();
-            }
-        }
-
-        return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
+      sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
+    } catch (Exception exception) {
+      logger.error(exception.getMessage());
+      exception.printStackTrace();
+      System.exit(1);
+    } finally {
+      synchronized (this) {
+        messageBroker.close();
+      }
     }
 
-    private synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
-                                             String correlationId, String xquery) throws Exception {
-        QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
-                DigestUtils.sha256Hex(xquery), eventState);
+    return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
+  }
 
-        ObjectMapper mapper = new ObjectMapper();
+  private synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
+      String correlationId, String xquery) throws Exception {
+    QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
+        DigestUtils.sha256Hex(xquery), eventState);
 
-        Message message = MessageMaker.createMessage(
-                messageBroker.getSession(),
-                messageBroker.getSession().createQueue(auditDestination),
-                UUID.randomUUID().toString(),
-                mapper.writeValueAsString(queryBalancerEvent));
+    ObjectMapper mapper = new ObjectMapper();
 
-        messageBroker.sendMessage(message);
+    Message message = MessageMaker.createMessage(
+        messageBroker.getSession(),
+        messageBroker.getSession().createQueue(auditDestination),
+        UUID.randomUUID().toString(),
+        mapper.writeValueAsString(queryBalancerEvent));
+
+    messageBroker.sendMessage(message);
+  }
+
+  private synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery,
+      String correlationId) throws Exception {
+    shardReplyToQueue = messageBroker.createTemporaryQueue();
+
+    Message message = MessageMaker.createMessage(
+        messageBroker.getSession(),
+        messageBroker.getSession().createTopic(xqueryDestination),
+        shardReplyToQueue,
+        correlationId,
+        xquery.getXQueryRequest());
+
+    messageBroker.sendMessage(message);
+  }
+
+  private synchronized List<Message> collectShardXQueryResponses() throws Exception {
+    return messageBroker.receiveMessagesTemporaryQueue(
+        shardReplyToQueue,
+        shardResponseTimeout,
+        shardResponseSecondaryTimeout);
+  }
+
+  private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
+      throws UnsupportedEncodingException, JMSException {
+    StringBuilder response = new StringBuilder("<xqueryResponse>\n");
+    for (Message message: shardXQueryResponses) {
+      response.append(MessageMaker.getBody(message)).append("\n");
     }
-
-    private synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery,
-                                                 String correlationId) throws Exception {
-        shardReplyToQueue = messageBroker.createTemporaryQueue();
-
-        Message message = MessageMaker.createMessage(
-                messageBroker.getSession(),
-                messageBroker.getSession().createTopic(xqueryDestination),
-                shardReplyToQueue,
-                correlationId,
-                xquery.getXQueryRequest());
-
-        messageBroker.sendMessage(message);
-    }
-
-    private synchronized List<Message> collectShardXQueryResponses() throws Exception {
-        return messageBroker.receiveMessagesTemporaryQueue(
-                shardReplyToQueue,
-                shardResponseTimeout,
-                shardResponseSecondaryTimeout);
-    }
-
-    private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
-            throws UnsupportedEncodingException, JMSException {
-        StringBuilder response = new StringBuilder("<xqueryResponse>\n");
-        for (Message message: shardXQueryResponses) {
-            response.append(MessageMaker.getBody(message)).append("\n");
-        }
-        return response.append("</xqueryResponse>").toString();
-    }
+    return response.append("</xqueryResponse>").toString();
+  }
 }

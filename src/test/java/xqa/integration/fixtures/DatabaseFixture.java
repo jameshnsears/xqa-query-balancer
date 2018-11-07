@@ -19,67 +19,66 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 public class DatabaseFixture {
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
-    @ClassRule
-    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
-            XqaQueryBalancerApplication.class,
-            ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
+  private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
+  @ClassRule
+  public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+      XqaQueryBalancerApplication.class,
+      ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
-    private String getResource() {
-        return Thread.currentThread().getContextClassLoader().getResource("database")
-                .getPath();
-    }
+  private String getResource() {
+    return Thread.currentThread().getContextClassLoader().getResource("database").getPath();
+  }
 
-    protected void setupStorage() throws Exception {
-        Class.forName(application.getConfiguration().getDataSourceFactory().getDriverClass());
-        Connection connection = DriverManager.getConnection(
-                application.getConfiguration().getDataSourceFactory().getUrl(),
-                application.getConfiguration().getDataSourceFactory().getUser(),
-                application.getConfiguration().getDataSourceFactory().getPassword());
-        truncate(connection);
-        populate(connection);
-        connection.close();
-    }
+  protected void setupStorage() throws Exception {
+    Class.forName(application.getConfiguration().getDataSourceFactory().getDriverClass());
+    Connection connection = DriverManager.getConnection(
+        application.getConfiguration().getDataSourceFactory().getUrl(),
+        application.getConfiguration().getDataSourceFactory().getUser(),
+        application.getConfiguration().getDataSourceFactory().getPassword());
+    truncate(connection);
+    populate(connection);
+    connection.close();
+  }
 
-    private void populate(Connection connection) throws IOException {
-        try (Stream<Path> filePathStream = Files.walk(Paths.get(getResource()))) {
-            filePathStream.forEach(filePath -> {
-                if (Files.isRegularFile(filePath)) {
-                    try {
-                        insertFileContentsIntoDatabase(connection, filePath);
-                    } catch (Exception exception) {
-                        logger.error(exception.getMessage());
-                    }
-                }
-            });
-        }
-    }
-
-    private void truncate(Connection connection) {
-        try {
-            executeSql(connection, "truncate events;");
-        } catch (SQLException exception) {
+  private void populate(Connection connection) throws IOException {
+    try (Stream<Path> filePathStream = Files.walk(Paths.get(getResource()))) {
+      filePathStream.forEach(filePath -> {
+        if (Files.isRegularFile(filePath)) {
+          try {
+            insertFileContentsIntoDatabase(connection, filePath);
+          } catch (Exception exception) {
             logger.error(exception.getMessage());
+          }
         }
+      });
     }
+  }
 
-    private void executeSql(Connection connection, String sql) throws SQLException {
-        Statement statement;
-        statement = connection.createStatement();
-        statement.execute(sql);
-        statement.close();
+  private void truncate(Connection connection) {
+    try {
+      executeSql(connection, "truncate events;");
+    } catch (SQLException exception) {
+      logger.error(exception.getMessage());
     }
+  }
 
-    private void insertFileContentsIntoDatabase(Connection connection, Path filePath)
-            throws Exception {
-        try (Stream<String> stream = Files.lines(filePath)) {
-            stream.forEach(line -> {
-                try {
-                    executeSql(connection, line);
-                } catch (SQLException exception) {
-                    logger.error(exception.getMessage());
-                }
-            });
+  private void executeSql(Connection connection, String sql) throws SQLException {
+    Statement statement;
+    statement = connection.createStatement();
+    statement.execute(sql);
+    statement.close();
+  }
+
+  private void insertFileContentsIntoDatabase(Connection connection, Path filePath)
+      throws Exception {
+    try (Stream<String> stream = Files.lines(filePath)) {
+      stream.forEach(line -> {
+        try {
+          executeSql(connection, line);
+        } catch (SQLException exception) {
+          logger.error(exception.getMessage());
         }
+      });
     }
+  }
 }
