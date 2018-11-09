@@ -1,9 +1,9 @@
-FROM debian:stretch
+FROM ubuntu:bionic
 
 MAINTAINER james.hn.sears@gmail.com
 
 RUN apt-get -qq update
-RUN apt-get -qq install -y openjdk-8-jre
+RUN apt-get -qq install -y openjdk-11-jre
 
 ARG OPTDIR=/opt
 ARG XQA=/xqa-query-balancer
