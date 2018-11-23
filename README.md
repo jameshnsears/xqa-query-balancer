@@ -1,5 +1,5 @@
 # xqa-query-balancer [![Build Status](https://travis-ci.org/jameshnsears/xqa-query-balancer.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-query-balancer) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-query-balancer/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-query-balancer?branch=master)
-* provides a REST API to execute:
+* REST API interface:
     * SQL/JSON against xqa-db.
     * XQuery against each xqa-shard and materialises the results.
 
