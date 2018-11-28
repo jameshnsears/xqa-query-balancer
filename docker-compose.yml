@@ -3,7 +3,8 @@ version: '3'
 services:
   xqa-query-balancer:
     build: .
-    image: "xqa-query-balancer"
+    image: xqa-query-balancer
+    container_name: xqa-query-balancer
     networks:
       - xqa
     depends_on:
@@ -12,6 +13,7 @@ services:
 
   xqa-db:
     image: jameshnsears/xqa-db:latest
+    container_name: xqa-db
     volumes:
       - "xqa-db:/var/lib/postgresql"
     ports:
@@ -21,6 +23,7 @@ services:
 
   xqa-message-broker:
     image: jameshnsears/xqa-message-broker:latest
+    container_name: xqa-message-broker
     ports:
       - "5672:5672"
       - "8161:8161"
@@ -31,6 +34,7 @@ services:
 
   xqa-ingest-balancer:
     image: jameshnsears/xqa-ingest-balancer:latest
+    container_name: xqa-ingest-balancer
     command: ["-message_broker_host", "xqa-message-broker", "-pool_size", "2"]
     networks:
       - xqa
@@ -39,6 +43,7 @@ services:
 
   xqa-shard:
     image: jameshnsears/xqa-shard:latest
+    container_name: xqa-shard
     command: ["-message_broker_host", "xqa-message-broker"]
     ports:
       - 1984

@@ -10,11 +10,11 @@
 * mvn clean package -DskipTests
 
 ### 1.2. Docker
-* docker-compose -p "dev" build --force-rm
+* docker-compose build --force-rm
 
 ## 2. Bring up
-* docker-compose -p "dev" up -d xqa-db xqa-message-broker xqa-ingest-balancer
-* docker-compose -p "dev" up -d --scale xqa-shard=2
+* docker-compose up -d xqa-db xqa-message-broker xqa-ingest-balancer
+* docker-compose up -d --scale xqa-shard=2
 
 ## 3. Test
 
@@ -28,7 +28,7 @@
 
 or
 
-* docker-compose -p "dev" up -d
+* docker-compose up -d
 
 #### 3.2.1. Endpoints
 * curl http://127.0.0.1:8080/search/shard/a510ab7f
@@ -40,7 +40,7 @@ or
 * curl http://127.0.0.1:8081/metrics
 
 ## 4. Teardown
-* docker-compose -p "dev" down -v
+* docker-compose down -v
 
 ## 5. Empty BaseX Container database
 * basexclient -U admin -P admin
