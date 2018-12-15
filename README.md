@@ -4,13 +4,7 @@
     * XQuery against each xqa-shard and materialises the results.
 
 ## 1. Build
-
-### 1.1. Maven
-* rm -rf $HOME/.m2/*
-* mvn clean package -DskipTests
-
-### 1.2. Docker
-* docker-compose build --force-rm
+* ./build.sh
 
 ## 2. Bring up
 * docker-compose up -d xqa-db xqa-message-broker xqa-ingest-balancer
