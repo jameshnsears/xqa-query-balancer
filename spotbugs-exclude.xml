@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <FindBugsFilter>
+    <Class name="xqa.resources.XQueryResource"/>
+    <And>
+        <Bug category="DM_EXIT"/>
+    </And>
 </FindBugsFilter>

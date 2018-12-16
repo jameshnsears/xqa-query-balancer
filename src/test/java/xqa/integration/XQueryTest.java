@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.ResourceHelpers;
 import io.dropwizard.testing.junit.DropwizardAppRule;
+import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.client.ClientProperties;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -17,8 +18,6 @@ import xqa.integration.fixtures.ShardFixture;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class XQueryTest extends ShardFixture {
     @ClassRule
@@ -42,6 +41,7 @@ public class XQueryTest extends ShardFixture {
         String regExMatcher = "\\\"<xqueryResponse>\\\\n<shard id='[a-zA-Z0-9]{8}'>\\\\n[0-9]{1,2}\\\\n<\\/shard>\\\\n<shard id='[a-zA-Z0-9]{8}'>\\\\n[0-9]{1,2}\\\\n<\\/shard>\\\\n<\\/xqueryResponse>\\\"";
 
         System.out.println(objectMapper.writeValueAsString(xqueryResponse.getXqueryResponse()));
-        assertThat(objectMapper.writeValueAsString(xqueryResponse.getXqueryResponse())).matches(regExMatcher);
+        Assertions.assertThat(objectMapper.writeValueAsString(xqueryResponse.getXqueryResponse()))
+                .matches(regExMatcher);
     }
 }

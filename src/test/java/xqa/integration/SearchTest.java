@@ -3,6 +3,7 @@ package xqa.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
 import xqa.integration.fixtures.DatabaseFixture;
@@ -12,7 +13,6 @@ import javax.ws.rs.BadRequestException;
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
 
 public class SearchTest extends DatabaseFixture {
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
@@ -47,6 +47,6 @@ public class SearchTest extends DatabaseFixture {
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/search/shard/e540188c")
                 .request().get(SearchResponse.class);
 
-        assertEquals(40, searchResponse.getSearchResponse().size());
+        Assertions.assertEquals(40, searchResponse.getSearchResponse().size());
     }
 }
