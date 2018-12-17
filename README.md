@@ -15,9 +15,7 @@ Featuring:
 ## 3. Test
 
 ### 3.1. Maven
-* mvn test
-* mvn jacoco:report coveralls:report
-* mvn site  # findbugs
+* See .travis.yml
 
 ### 3.2. CLI
 * java -jar target/xqa-query-balancer-1.0.0-SNAPSHOT.jar server xqa-query-balancer.yml
