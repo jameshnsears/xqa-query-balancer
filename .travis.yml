@@ -34,4 +34,4 @@ script:
 
 after_success:
   - mvn jacoco:report coveralls:report
-  - sonar-scannert
+  - sonar-scanner
