@@ -5,6 +5,13 @@ sudo: required
 notifications:
 email: james.hn.sears@gmail.com
 
+env:
+  global:
+    # travis encrypt COVERALLS_REPO_TOKEN=...
+    - secure: "OlJmZFX4lPm0MhSLTqM7V+CtgeMTl4GDD5kpPqXPdCFGSpPT14fAtufXEygZrNyoQ/vGT+GR4vzCGFO2FWsAPY8nPMwZVLF8GhcUezIQmaSekq1dC7i1EY5FqxaO/bxkkGJpbe8wdZqvJpXp5w4Bw4jUOVSqwU6iFUcv6s+VGE8Li74xTJkH4Lg5Gu+sl+gmXZhxmqe7fEGK7g1xo7K3QlUoYblZTEx1+z8a2WWcRDvag+2LbHd0LFhtWXRqu2NwuQVxkZiU2Y2Z9mWuWZ8Lob1Ape7HnapN8UIgzbfrjPPtdJ//c08bNPJSpuw1B3Sml59VAtxubALIwzxwnmnNYTU7Pf//MFLAqcDPSIIOt/SfqppX7SeUM03Xv7ZhxBuzdnyNzTDdVjFEB5tSbcmW4ZlGtBcjd1qNyh+TJ8t3ZoUjLa5OV3EypW9eSTTqpPKdj/qjV+TDpzpjIprRatPaU0p25u+zqczTaxT/3y3CZjU2DDA/c9DJk+7mnLyXYa4z4kcaPiB5ziaIwDYToUrUAbVEWvz7nmJa9qregEgLlIF0KKLwTceWEBMmxtgLKVGnHhMg42I+aGT2T8tBNGEgxUH7lOnEUhmw1Vfdv6eqbC3yXEGB9C3EpovckyoLqeiceMfoDAwBncdkMOiTUw89BWogYN+u8s6IcFLs5y4DLBE="
+    # travis encrypt CODACY_PROJECT_TOKEN=...
+    - secure: "DGDqvFmJWNM9yjQF53vRa8wIFtLwuIu/f513QxEQGWTdaIxvESertoNBhgq4bIbxVbcF61LDMifgtsYqKOFIfTGF3THREezn5DH1jpeXQPKvZRq9pW1F7/9VTV3jSJXf7rgGX/YJ/01N+gOrOe6ckcvL5Yjtc5YF3lU8A4kBrDRQ2d6o9vpDeu3eb7UURULVrBUgo+9p2AJ7W3Mdvuy4UoZxysBY5JIp5ckNfdLdjEyo31KrKAlzlv2rYpUXi0ujwjrgZVSi7NZADWWA8nuBZosYOVKges6tt0GpPfW5sQjJK0Xx6sp8wBKN//klE+U/LQI9iPrO4VVWqCG+915wPazvQztWuT52pvuboGPAQGrbr4YPh97bPAYdEye6qpVHIopIEp4snjb1FXmytoZXYYz1YyU+B0pB7f0aMeyxKTFVoOqP+IYoCe1WgaK2DxnklutFo4jfmZhlxE0uVl9iwMZ+TXOF13+VagmYNSBtApwXais36K0sl2PUZqbkF0F9u5sKvCMvrINH3AnyyOPLpsDwqS7gVaHdfEe9dJdqF9WvItR/gq3kxgeX0WPQILjm753WdkhvY0n8Di06OVujJ9ZrOAVADSdlGr8blTPwwyCsL4ZYrx5PRs+ceiblmHgtf2KWqeWZuoTzxXzyPDrBuUe0QQdiuPrSbgIVxSgZDkA="
+
 addons:
   sonarcloud:
     organization: "jameshnsears-github"
@@ -28,6 +35,7 @@ cache:
 before_script:
   - sudo service postgresql stop
   - while sudo lsof -Pi :5432 -sTCP:LISTEN -t; do sleep 1; done
+  - wget https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 script:
   - docker-compose up -d xqa-db xqa-message-broker xqa-ingest-balancer
@@ -37,4 +45,5 @@ script:
 
 after_success:
   - mvn jacoco:report coveralls:report
+  - java -jar codacy-coverage-reporter-4.0.5-assembly.jar report -l Java -r target/site/jacoco/jacoco.xml
   - sonar-scanner
