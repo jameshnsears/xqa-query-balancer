@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  xqa-query-balancer:
+    build: .
+    image: xqa-query-balancer
+    container_name: xqa-query-balancer
+    networks:
+      - xqa
+    depends_on:
+      - xqa-db
+      - xqa-message-broker
+
   xqa-db:
     image: jameshnsears/xqa-db:latest
     container_name: xqa-db
