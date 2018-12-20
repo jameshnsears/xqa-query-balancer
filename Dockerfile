@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 RUN apt-get -qq update
-RUN apt-get -qq install -y --no-install-recommends openjdk-11-jre
+RUN apt-get -qq install -y openjdk-11-jre
 
 ARG OPTDIR=/opt
 ARG XQA=/xqa-query-balancer
