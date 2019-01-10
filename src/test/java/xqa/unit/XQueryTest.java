@@ -1,5 +1,7 @@
-package unit;
+package xqa.unit;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jameshnsears.configuration.ConfigurationAccessor;
 import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
@@ -10,13 +12,11 @@ import io.dropwizard.testing.ResourceHelpers;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import unit.fixtures.ShardFixture;
+import xqa.unit.fixtures.ShardFixture;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.xquery.XQueryRequest;
@@ -37,22 +37,33 @@ public class XQueryTest extends ShardFixture {
 
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
-    private DockerClient dockerClient;
+    private static DockerClient dockerClient;
 
-    @BeforeEach
-    public void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
+    @BeforeAll
+    public static void startContainers(final ConfigurationAccessor configurationAccessor) {
         dockerClient = new DockerClient();
-        dockerClient.pull(configurationAccessor.images());
-        dockerClient.startContainers(configurationAccessor);
 
-        application.before();
+        LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
+        Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
+        ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
+
+        try {
+            dockerClient.pull(configurationAccessor.images());
+            dockerClient.startContainers(configurationAccessor);
+            application.before();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    @AfterEach
-    public void stopcontainers(final ConfigurationAccessor configurationAccessor) throws IOException {
-        dockerClient.rmContainers(configurationAccessor);
-
-        application.after();
+    @AfterAll
+    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) {
+        try {
+            dockerClient.rmContainers(configurationAccessor);
+            application.after();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

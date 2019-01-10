@@ -20,12 +20,11 @@ database:
   minIdleTime: 1 minute
 
 logging:
-  level: INFO
+  level: OFF
   loggers:
     org.apache.qpid.jms: WARN
     org.apache.tomcat.jdbc: WARN
     xqa: DEBUG
-    com.github.jameshnsears: WARN
   appenders:
     - type: console
     - type: file

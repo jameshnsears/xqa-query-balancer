@@ -1,4 +1,4 @@
-package unit.fixtures;
+package xqa.unit.fixtures;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;

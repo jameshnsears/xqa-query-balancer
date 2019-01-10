@@ -1,6 +1,6 @@
-do an end to end with all data, against two shards to build the json db
+turn off com.github.jameshnsears.docker.DockerClient
 
---
+make sure insert-01-sql and insert-02.sql created in db
 
 define API & test it
 

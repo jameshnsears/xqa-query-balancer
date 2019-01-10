@@ -1,14 +1,11 @@
-package unit.fixtures;
+package xqa.unit.fixtures;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jameshnsears.configuration.ConfigurationAccessor;
 import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
 import com.github.jameshnsears.docker.DockerClient;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,7 @@ public class DatabaseFixture {
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
-    protected static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
+    protected static Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
 
     protected static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
@@ -83,9 +80,12 @@ public class DatabaseFixture {
 
     private void insertFileContentsIntoDatabase(Connection connection, Path filePath)
             throws Exception {
+        logger.debug(filePath.toString());
+
         try (Stream<String> stream = Files.lines(filePath)) {
             stream.forEach(line -> {
                 try {
+                    logger.debug(line);
                     executeSql(connection, line);
                 } catch (SQLException exception) {
                     logger.error(exception.getMessage());
