@@ -1,5 +1,5 @@
 # xqa-query-balancer [![Build Status](https://travis-ci.org/jameshnsears/xqa-query-balancer.svg?branch=master)](https://travis-ci.org/jameshnsears/xqa-query-balancer) [![Coverage Status](https://coveralls.io/repos/github/jameshnsears/xqa-query-balancer/badge.svg?branch=master)](https://coveralls.io/github/jameshnsears/xqa-query-balancer?branch=master) [![sonarcloud.io](https://sonarcloud.io/api/project_badges/measure?project=jameshnsears_xqa-query-balancer&metric=alert_status)](https://sonarcloud.io/dashboard?id=jameshnsears_xqa-query-balancer) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4dbb854a0f774b85898d5c36fb0a9032)](https://www.codacy.com/app/jameshnsears/xqa-query-balancer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jameshnsears/xqa-query-balancer&amp;utm_campaign=Badge_Grade)
-* REST API interface.
+* XQA REST API.
 
 Featuring:
 * SQL/JSON against xqa-db.
@@ -8,35 +8,29 @@ Featuring:
 ## 1. Build
 * ./build.sh
 
-## 2. Bring up
-* docker-compose up -d xqa-db xqa-message-broker xqa-ingest-balancer
-* docker-compose up -d --scale xqa-shard=2
+## 2. Test
 
-## 3. Test
-
-### 3.1. Maven
+### 2.1. Maven
 * See .travis.yml
 
-### 3.2. CLI
+### 2.2. CLI 
+* docker-compose up -d xqa-message-broker xqa-db
+* docker-compose scale xqa-shard=2 
 * java -jar target/xqa-query-balancer-1.0.0-SNAPSHOT.jar server xqa-query-balancer.yml
 
-or
+### 2.2.1. Endpoints
+* curl http://127.0.0.1:9090/search/shard/a510ab7f
+* curl http://127.0.0.1:9090/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
-* docker-compose up -d
+* curl -X POST http://127.0.0.1:9091/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
+* curl -X POST http://127.0.0.1:9091/tasks/gc
+* curl http://127.0.0.1:9091/healthcheck
+* curl http://127.0.0.1:9091/metrics
 
-#### 3.2.1. Endpoints
-* curl http://127.0.0.1:8080/search/shard/a510ab7f
-* curl http://127.0.0.1:8080/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
-
-* curl -X POST http://127.0.0.1:8081/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
-* curl -X POST http://127.0.0.1:8081/tasks/gc
-* curl http://127.0.0.1:8081/healthcheck
-* curl http://127.0.0.1:8081/metrics
-
-## 4. Teardown
+## 3. Teardown
 * docker-compose down -v
 
-## 5. Empty BaseX Container database
+## 4. Empty BaseX Container database
 * basexclient -U admin -P admin
 * open xqa
 * delete /

@@ -25,6 +25,7 @@ logging:
     org.apache.qpid.jms: WARN
     org.apache.tomcat.jdbc: WARN
     xqa: DEBUG
+    com.github.jameshnsears: WARN
   appenders:
     - type: console
     - type: file
@@ -39,9 +40,9 @@ messageBroker:
   port: 5672
   userName: admin
   password: admin
-  retryAttempts: 3
+  retryAttempts: 10
   xqueryDestination: xqa.shard.xquery
   ingestDestination: xqa.ingest
   auditDestination: xqa.event
-  shardResponseTimeout: 60000
+  shardResponseTimeout: 1000
   shardResponseSecondaryTimeout: 5000

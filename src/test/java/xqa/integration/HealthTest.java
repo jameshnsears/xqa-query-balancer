@@ -1,12 +1,17 @@
 package xqa.integration;
 
+import com.github.jameshnsears.configuration.ConfigurationAccessor;
+import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
+import com.github.jameshnsears.docker.DockerClient;
+import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 
@@ -15,11 +20,29 @@ import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(ConfigurationParameterResolver.class)
 public class HealthTest {
-    @ClassRule
-    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+    private static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
+
+    private DockerClient dockerClient;
+
+    @BeforeEach
+    public void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
+        dockerClient = new DockerClient();
+        dockerClient.pull(configurationAccessor.images());
+        dockerClient.startContainers(configurationAccessor);
+
+        application.before();
+    }
+
+    @AfterEach
+    public void stopcontainers(final ConfigurationAccessor configurationAccessor) throws IOException {
+        dockerClient.rmContainers(configurationAccessor);
+
+        application.after();
+    }
 
     @Test
     public void queryBalancerHealth() throws IOException {

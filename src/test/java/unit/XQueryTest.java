@@ -1,37 +1,67 @@
-package xqa.integration;
+package unit;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jameshnsears.configuration.ConfigurationAccessor;
+import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
+import com.github.jameshnsears.docker.DockerClient;
 import io.dropwizard.jackson.Jackson;
+import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.client.ClientProperties;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import unit.fixtures.ShardFixture;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
-import xqa.integration.fixtures.ShardFixture;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
 
+@ExtendWith(ConfigurationParameterResolver.class)
 public class XQueryTest extends ShardFixture {
-    @ClassRule
-    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+    private static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
+
     private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
+
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
+
+    private DockerClient dockerClient;
+
+    @BeforeEach
+    public void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
+        dockerClient = new DockerClient();
+        dockerClient.pull(configurationAccessor.images());
+        dockerClient.startContainers(configurationAccessor);
+
+        application.before();
+    }
+
+    @AfterEach
+    public void stopcontainers(final ConfigurationAccessor configurationAccessor) throws IOException {
+        dockerClient.rmContainers(configurationAccessor);
+
+        application.after();
+    }
 
     @Test
     public void xquery() throws Exception {
         setupStorage(application.getConfiguration());
 
-        final XQueryResponse xqueryResponse = application.client()
+        Client client = JerseyClientBuilder.createClient();
+
+        final XQueryResponse xqueryResponse = client
                 .property(ClientProperties.READ_TIMEOUT, 10000)
                 .target("http://0.0.0.0:" + application.getLocalPort() + "/xquery")
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("count(/)")))

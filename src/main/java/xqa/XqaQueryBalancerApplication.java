@@ -13,6 +13,7 @@ import xqa.health.QueryBalancerHealthCheck;
 import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
 
+import javax.jms.JMSException;
 import java.util.UUID;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
@@ -27,7 +28,7 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
 
     public static void main(String[] args) throws Exception {
         new XqaQueryBalancerApplication().run(args);
-    }
+     }
 
     @Override
     public String getName() {
@@ -43,6 +44,7 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
     @Override
     public void run(XqaQueryBalancerConfiguration configuration, Environment environment)
             throws Exception {
+
         environment.healthChecks().register("QueryBalancerHealthCheck", new QueryBalancerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();

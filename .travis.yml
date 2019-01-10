@@ -38,8 +38,6 @@ before_script:
   - wget https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.5/codacy-coverage-reporter-4.0.5-assembly.jar
 
 script:
-  - docker-compose up -d xqa-db xqa-message-broker xqa-ingest-balancer
-  - docker-compose up -d --scale xqa-shard=2
   - mvn clean test
   - mvn checkstyle:check spotbugs:check pmd:pmd
 

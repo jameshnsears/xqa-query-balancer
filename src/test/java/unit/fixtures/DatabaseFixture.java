@@ -1,8 +1,15 @@
-package xqa.integration.fixtures;
+package unit.fixtures;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jameshnsears.configuration.ConfigurationAccessor;
+import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
+import com.github.jameshnsears.docker.DockerClient;
+import io.dropwizard.jackson.Jackson;
+import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import io.dropwizard.testing.junit.DropwizardAppRule;
-import org.junit.ClassRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.XqaQueryBalancerApplication;
@@ -18,12 +25,17 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Stream;
 
+@ExtendWith(ConfigurationParameterResolver.class)
 public class DatabaseFixture {
-    @ClassRule
-    public static final DropwizardAppRule<XqaQueryBalancerConfiguration> application = new DropwizardAppRule<>(
+    protected static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
+
+    protected static final Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
+
+    protected static final ObjectMapper objectMapper = Jackson.newObjectMapper();
+
+    protected static DockerClient dockerClient;
 
     private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("database").getPath();

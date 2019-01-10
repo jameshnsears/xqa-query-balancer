@@ -1,0 +1,31 @@
+[
+  {
+    "image": "jameshnsears/xqa-message-broker:latest",
+    "name": "xqa-message-broker",
+    "ports": {
+      "5672/tcp": 5672,
+      "8161/tcp": 8161
+    },
+    "network": "xqa"
+  },
+  {
+    "image": "jameshnsears/xqa-db:latest",
+    "name": "xqa-db",
+    "ports": {
+      "5432/tcp": 5432
+    },
+    "network": "xqa"
+  },
+  {
+    "image": "jameshnsears/xqa-shard:latest",
+    "name": "xqa-shard-00",
+    "command": "-message_broker_host xqa-message-broker",
+    "network": "xqa"
+  },
+  {
+    "image": "jameshnsears/xqa-shard:latest",
+    "name": "xqa-shard-01",
+    "command": "-message_broker_host xqa-message-broker",
+    "network": "xqa"
+  }
+]
