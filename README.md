@@ -30,7 +30,21 @@ Featuring:
 ## 3. Teardown
 * docker-compose down -v
 
-## 4. Empty BaseX Container database
+## 4. Database Connectivity
+## 4.1. Empty BaseX Container database
 * basexclient -U admin -P admin
 * open xqa
 * delete /
+
+## 4.2. psql
+```
+psql -h 0.0.0.0 -p 5432 -U xqa
+
+select  distinct to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+        info->>'source' as filename,
+        info->>'digest' as digest,
+        info->>'serviceId' as service
+from events
+where filename like '%/xml/DAQU-1931-0321.xml%'
+order by creationTime asc;
+```

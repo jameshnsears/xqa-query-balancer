@@ -1,17 +1,24 @@
 package xqa.resources;
 
-import com.codahale.metrics.annotation.Timed;
+import java.util.List;
+import java.util.Optional;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.annotation.Timed;
+
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Optional;
 
 @Path("/search")
 @Produces(MediaType.APPLICATION_JSON)

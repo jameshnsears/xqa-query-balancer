@@ -1,8 +1,8 @@
 package xqa.api.search;
 
-import com.google.common.collect.Lists;
-
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class SearchResponse {
     private final List<SearchResult> searchResult = Lists.newArrayList();

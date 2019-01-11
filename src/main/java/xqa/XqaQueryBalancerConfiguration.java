@@ -1,12 +1,13 @@
 package xqa;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 public class XqaQueryBalancerConfiguration extends Configuration {
     @Valid

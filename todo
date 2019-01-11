@@ -1,23 +1,118 @@
-turn off com.github.jameshnsears.docker.DockerClient
-
-make sure insert-01-sql and insert-02.sql created in db
-
 define API & test it
+= load two xqa shard with same data created by database
 
-all search results ordered by time desc
+0. /search == returns everything
+1. /search/filename/<filename>  == i.e. DBER-1923-0416.xml
+2. /search/digest/<digest> == i.e. aa84010b
+3. /search/service/<id> == i.e. ingest/02bd02c2 / ingestbalancer/6336fca0 / shard/ee251962
 
-/search/<blank> == return everything
-/search/filename/<filename>  == i.e. DBER-1923-0416.xml
-/search/digest/<digest> == i.e. aa84010b
-/search/service/<id> == i.e. ingest/02bd02c2 / ingestbalancer/6336fca0 / shard/ee251962
-
-2018-03-16 17:52:23.259682	DBER-1923-0416.xml	aa84010b	ingest/02bd02c2
-2018-03-16 17:52:31.665320	DBER-1923-0416.xml	aa84010b	ingestbalancer/6336fca0
-2018-03-16 17:52:38.864672	DBER-1923-0416.xml	aa84010b	shard/ee251962
-
-/xquery/<xquery>
+4. /xquery/<xquery>
 
 /tasks/log-level
 /tasks/gc
 /healthcheck
 /metrics
+
+---
+
+0. return everything
+
+select  to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+        info->>'source' as filename,
+        info->>'digest' as digest,
+        info->>'serviceId' as service
+from events
+order by creationTime asc;
+
+---
+
+1. digest for a file
+
+select  to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+        info->>'source' as filename,
+        info->>'digest' as digest,
+        info->>'serviceId' as service
+from events
+where info->>'source' like '%/xml/DAQU-1931-0321.xml%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START'
+order by creationTime asc;
+
+        creationtime        |        filename         |                              digest                              |     service
+----------------------------+-------------------------+------------------------------------------------------------------+-----------------
+ 2018-03-26 07:27:54.973+00 | /xml/DAQU-1931-0321.xml | d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00 | ingest/d6d26946
+
+---
+
+2. stages a digest passes through
+
+select  to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+        info->>'source' as filename,
+        info->>'digest' as digest,
+        info->>'serviceId' as service
+from events
+where info->>'digest' like '%d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00%' and info->>'state' = 'START'
+order by creationTime asc;
+
+        creationtime        |        filename         |                              digest                              |         service
+----------------------------+-------------------------+------------------------------------------------------------------+-------------------------
+ 2018-03-26 07:27:54.973+00 | /xml/DAQU-1931-0321.xml | d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00 | ingest/d6d26946
+ 2018-03-26 07:27:56.773+00 |                         | d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00 | ingestbalancer/4b3e3f2c
+ 2018-03-26 07:28:05.328+00 |                         | d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00 | shard/e540188c
+
+---
+
+3. events related to a service
+
+select  to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+        info->>'source' as filename,
+        info->>'digest' as digest,
+        info->>'serviceId' as service
+from events
+where info->>'serviceId' like '%ingest/d6d26946%' and info->>'state' = 'START'
+order by creationTime asc;
+
+        creationtime        |                  filename                  |                              digest                              |     service
+----------------------------+--------------------------------------------+------------------------------------------------------------------+-----------------
+ 2018-03-26 07:27:54.973+00 | /xml/DAQU-1931-0321.xml                    | d6f04c988162284ff57c06e69314ba20cedfc79e74585bd31990f0b897590e00 | ingest/d6d26946
+ 2018-03-26 07:27:57.279+00 | /xml/DBER-1923-0416.xml                    | aa84010cfefca52e93b61d528a4e869b0cc7b051fd627a072c0b38857d97d8b5 | ingest/d6d26946
+ 2018-03-26 07:28:00.145+00 | /xml/INDA-1990-0402.xml                    | 4a8c4b2446c43100290f2cd067d37a5400f4cca95b91d440a7164a782f365597 | ingest/d6d26946
+ 2018-03-26 07:28:03.378+00 | /xml/INDA-1995-0303.xml                    | a43ebee157c2ea4873973c6b20331ef230a2a8d0cb0c47b83431928e9ef08098 | ingest/d6d26946
+ 2018-03-26 07:28:04.687+00 | /xml/PNCH-1932-0210.xml                    | 86fbeb3be9a3850fed53b205039740f0507f7f8941c7e59a2ed13f555444dbee | ingest/d6d26946
+ 2018-03-26 07:28:05.918+00 | /xml/PNCH-1985-1016.xml                    | 6197fda2b243e5131fc4b6bb39f28f6ea2c3f4111ee1dc9de7d54d195d0e70e9 | ingest/d6d26946
+ 2018-03-26 07:28:07.13+00  | /xml/cho_rpax_2008_itsunori_000_0000.xml   | 30ee1eaa757114fe50b051e6db3b49c6944eb987f3da5d0e68a06b21c7206bd6 | ingest/d6d26946
+ 2018-03-26 07:28:09.238+00 | /xml/cho_rsxx_1939_simpson_002_0000.xml    | 850c2be3de13b99cdbce75701914656cf2249e001e604a4ab7bb61ba4e7d53f1 | ingest/d6d26946
+ 2018-03-26 07:28:12.198+00 | /xml/cho_sbca_1939-1952_0004_000_0000.xml  | e8d659dc3093e85ea2286192aa33e9acfa3a06157eed1b8af300460d1f758def | ingest/d6d26946
+ 2018-03-26 07:28:15.218+00 | /xml/cho_siax_1963_0000_000_0000.xml       | 5f6ec2577f51f8d872c5275232e3dc23eba79c895964a819aa756690e9943186 | ingest/d6d26946
+ 2018-03-26 07:28:18.581+00 | /xml/cho_wtxx_2007_0063_000_0000.xml       | e02474a926c2532593b7c31e0db514cedfda841d70db23f961570d74c0890524 | ingest/d6d26946
+ 2018-03-26 07:28:20.615+00 | /xml/eapb_mon_14537E_007_002.xml           | 7732c995f41a3e74eeaef061e2d0de9055e085d7ad8bc38a23a2611dc0272ada | ingest/d6d26946
+ 2018-03-26 07:28:21.387+00 | /xml/eapb_nwp_14599E_002_011_022.xml       | c10143d24c2a9b7fe12d93f03059ad137c4f1ba75315d5400b8025d7b196fa82 | ingest/d6d26946
+ 2018-03-26 07:28:21.78+00  | /xml/nicn_nwp_078_17101111_0195.xml        | 192a0c3918e308c1374d57256b183045393c1cf9053a8614e9d7bb24b8261358 | ingest/d6d26946
+ 2018-03-26 07:28:22.181+00 | /xml/nicn_nwp_141_17020420_3802.xml        | 6bdba013502e0235897469dfe5afcf39068ed0955a0f10539a9c3f9095a81e56 | ingest/d6d26946
+ 2018-03-26 07:28:22.501+00 | /xml/cho_chrx_2008_rossi_003_0000.xml      | 05af674c3a1fe5af9abbc534df8b977b2a14f4039d064969202baa526111610b | ingest/d6d26946
+ 2018-03-26 07:28:22.7+00   | /xml/cho_chrx_2004_brack_000_0000.xml      | 1494c3817dade02bb7b9fc0759950aea3510c786636fac5d69ff2bf8b4d9ab42 | ingest/d6d26946
+ 2018-03-26 07:28:22.92+00  | /xml/cho_chrx_2001_korppoo_001_0000.xml    | c0134ca3e6d2b2efee2bf99ede9cb152988ed9b229dc3848bec5c07df69e3a62 | ingest/d6d26946
+ 2018-03-26 07:28:23.067+00 | /xml/cho_rpax_1970_royal_007_0000.xml      | 6f0231632610550b37fff133dcfde33ae418cded4adcce8cf179c796edcc44c6 | ingest/d6d26946
+ 2018-03-26 07:28:23.219+00 | /xml/cho_rfpc_1943-1945L_0000_059_0000.xml | 13318e840734646429523cfdc18afbe20122995725d10d62aafc6b0597c62953 | ingest/d6d26946
+ 2018-03-26 07:28:23.458+00 | /xml/cho_rfpc_1943-1945L_0000_072_0000.xml | aa1d8b7af64007d3ecd85c6fa68246f4cd51981a81eaee0b43eff4036de3586f | ingest/d6d26946
+ 2018-03-26 07:28:23.658+00 | /xml/cho_chrx_2006_0000_027_0000.xml       | efab29f1fd1e9616c1a04c5954724711a4070de5c71797805014df0db817bcff | ingest/d6d26946
+ 2018-03-26 07:28:23.825+00 | /xml/cho_rpax_1970_royal_005_0000.xml      | 9bc5a38243999b455d5384397a395861131a5ba158a3c495968a0bf4ff67f40c | ingest/d6d26946
+ 2018-03-26 07:28:23.968+00 | /xml/SP-MAIN-122-m0005-cm.xml              | 7a5a035597d50acb7b8e4d7ec7fc8de14635ee12a7ad306c904c5b09b635c966 | ingest/d6d26946
+ 2018-03-26 07:28:24.105+00 | /xml/cho_chrx_2003_green_008_0000.xml      | 3a31e79f9ec54e0a85f20fa4926acee0cceaad095f5a69c007e28c84cc19d102 | ingest/d6d26946
+ 2018-03-26 07:28:24.343+00 | /xml/cho_chrx_2003_grubb_001_0000.xml      | 5173434b06f54b6b5806524aaa3af931f846a1bc04c725057d8633f0c5156d99 | ingest/d6d26946
+ 2018-03-26 07:28:24.546+00 | /xml/SP-MAIN-245-m0130-cm.xml              | f3737debe47ce8da198e70d840a60d72e995fe155240db54aebcd9af6d52d450 | ingest/d6d26946
+ 2018-03-26 07:28:24.712+00 | /xml/cho_rfpc_1943-1945L_0000_032_0000.xml | e61ae90223b98dac901986d39460b18e7a4785d20e35a92755653df946ecb72a | ingest/d6d26946
+ 2018-03-26 07:28:24.921+00 | /xml/cho_chrx_2008_ghana_000_0000.xml      | 76934694114c14da16c4129512aaa3b5b0a9f0590b660ce079f99e253c5b6792 | ingest/d6d26946
+ 2018-03-26 07:28:25.203+00 | /xml/cho_chrx_2004_ming_001_0000.xml       | 91e52f923b8f0f5f78901489352e803bbfea09d341db22bfa2046a35365d237a | ingest/d6d26946
+ 2018-03-26 07:28:25.525+00 | /xml/cho_meet_1985_4585_000_0000.xml       | f8e818d9051cb3cca9385ce0874281d405c6604c99b2d93408af125681df347b | ingest/d6d26946
+ 2018-03-26 07:28:25.724+00 | /xml/cho_rpax_2008_campos_001_0000.xml     | 4225fe6d63e75c33bccb50ecc09f49f4e62bd977e7e5f28206ff705ca0a76052 | ingest/d6d26946
+ 2018-03-26 07:28:26.322+00 | /xml/ECON-2014-0104.xml                    | 0e35b24eeecd62b649723933819404f943f949002af9a002223ddb9c44e75bd4 | ingest/d6d26946
+ 2018-03-26 07:28:26.901+00 | /xml/cho_meet_1943_0956_000_0000.xml       | 95d04dc2a2e537e14ad010d6a033ae92e20fa6b3745054be3ccae2aa403afa0c | ingest/d6d26946
+ 2018-03-26 07:28:27.041+00 | /xml/cho_meet_1949_1705_000_0000.xml       | 02e062177e36a06c5b33f58f0dea830355de9b5d0937dd479c1e8f68d7c429d5 | ingest/d6d26946
+ 2018-03-26 07:28:27.163+00 | /xml/cho_chrx_2004_peterson_000_0000.xml   | 701ddaf8543f528e8ddc86cedfb09f7c09299a7e2c5edd10fb220bfb004e538e | ingest/d6d26946
+ 2018-03-26 07:28:27.673+00 | /xml/ECON-2014-0809.xml                    | 860457f610d0bd0fb6e0946e903e99f282e509655568a65ce5250f96ab4a92f9 | ingest/d6d26946
+ 2018-03-26 07:28:28.209+00 | /xml/cho_chrx_2008_hakura_000_0000.xml     | 640029a138e9641b87b3ca1e65e8191211ac6d7de0715d63e326dc4a8fea21ec | ingest/d6d26946
+ 2018-03-26 07:28:28.433+00 | /xml/cho_meet_1997_5847_000_0000.xml       | ea5f11666b03a96407b5f9f28ba022d5120701cfc0fa957b951012edb002ae26 | ingest/d6d26946
+ 2018-03-26 07:28:28.653+00 | /xml/cho_meet_1943_0958_000_0000.xml       | d6164954163ddb783f4b7f1eaefb0e52a64009034b8a33a376e35d28f6139785 | ingest/d6d26946
+
+---
+
+4. materialised, across n shards, xquery
