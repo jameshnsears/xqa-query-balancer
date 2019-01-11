@@ -1,4 +1,4 @@
-package xqa.unit.fixtures;
+package xqa.integration.fixtures;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jameshnsears.configuration.ConfigurationParameterResolver;
@@ -23,7 +23,7 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 @ExtendWith(ConfigurationParameterResolver.class)
-public class DatabaseFixture {
+public class DatabaseFixture extends Containerisation {
     protected static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));

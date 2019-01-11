@@ -1,4 +1,4 @@
-package xqa.unit.fixtures;
+package xqa.integration.fixtures;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public class ShardFixture {
+public class ShardFixture extends Containerisation {
     private static final Logger logger = LoggerFactory.getLogger(ShardFixture.class);
     private MessageBrokerConfiguration messageBrokerConfiguration;
     private MessageBroker messageBroker;
@@ -40,7 +40,7 @@ public class ShardFixture {
     }
 
     private void waitForDataToGetInsertedIntoShards() throws InterruptedException {
-        Thread.sleep(10000);
+        Thread.sleep(20000);
     }
 
     private void populateShards() throws IOException {
@@ -58,6 +58,7 @@ public class ShardFixture {
     }
 
     private void insertFileContentsIntoShard(Path filePath) throws Exception {
+        logger.debug(filePath.toString());
         Message message = MessageMaker.createMessage(messageBroker.getSession(),
                 messageBroker.getSession().createQueue(messageBrokerConfiguration.getIngestDestination()),
                 UUID.randomUUID().toString(), filePath.toString(),

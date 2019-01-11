@@ -9,6 +9,12 @@
     "network": "xqa"
   },
   {
+    "image": "jameshnsears/xqa-ingest-balancer:latest",
+    "name": "xqa-ingest-balancer",
+    "command": "-message_broker_host xqa-message-broker -pool_size 2 -insert_thread_wait 1000",
+    "network": "xqa"
+  },
+  {
     "image": "jameshnsears/xqa-db:latest",
     "name": "xqa-db",
     "ports": {
