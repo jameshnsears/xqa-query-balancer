@@ -9,6 +9,11 @@ import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 
 import javax.jms.Message;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,8 +24,22 @@ import java.util.stream.Stream;
 
 public class ShardFixture extends Containerisation {
     private static final Logger logger = LoggerFactory.getLogger(ShardFixture.class);
+
     private MessageBrokerConfiguration messageBrokerConfiguration;
+
     private MessageBroker messageBroker;
+
+    protected DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    protected DocumentBuilder documentBuilder;
+    protected XPath xPath = XPathFactory.newInstance().newXPath();
+
+    public ShardFixture() {
+        try {
+            documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException exception) {
+            logger.error(exception.getMessage());
+        }
+    }
 
     private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("shard").getPath();
@@ -40,7 +59,7 @@ public class ShardFixture extends Containerisation {
     }
 
     private void waitForDataToGetInsertedIntoShards() throws InterruptedException {
-        Thread.sleep(20000);
+        Thread.sleep(15000);
     }
 
     private void populateShards() throws IOException {

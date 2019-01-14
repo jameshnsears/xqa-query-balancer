@@ -3,7 +3,7 @@
 
 Featuring:
 * SQL/JSON against xqa-db.
-* XQuery against each xqa-shard and materialises the results.
+* Materialised XQuery against xqa-shard(s).
 
 ## 1. Build
 * ./build.sh
@@ -14,11 +14,11 @@ Featuring:
 * See .travis.yml
 
 ### 2.2. CLI 
-* docker-compose up -d xqa-message-broker xqa-db
+* docker-compose up -d xqa-message-broker xqa-db xqa-ingest-balancer
 * docker-compose scale xqa-shard=2 
 * java -jar target/xqa-query-balancer-1.0.0-SNAPSHOT.jar server xqa-query-balancer.yml
 
-### 2.2.1. Endpoints
+### 2.2.1. Endpoints from CLI
 * curl http://127.0.0.1:9090/search/shard/a510ab7f
 * curl http://127.0.0.1:9090/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 

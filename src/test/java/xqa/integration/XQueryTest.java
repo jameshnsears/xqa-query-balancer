@@ -17,11 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import xqa.integration.SearchTest;
 import xqa.integration.fixtures.ShardFixture;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
@@ -31,11 +29,7 @@ import xqa.api.xquery.XQueryResponse;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 
 @ExtendWith(ConfigurationParameterResolver.class)
@@ -61,6 +55,9 @@ public class XQueryTest extends ShardFixture {
         try {
             dockerClient.pull(configurationAccessor.images());
             dockerClient.startContainers(configurationAccessor);
+
+            // give containers time to start up
+            Thread.sleep(5000);
             application.before();
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,7 +65,7 @@ public class XQueryTest extends ShardFixture {
     }
 
     @AfterAll
-    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) {
+    public static void stopContainers(final ConfigurationAccessor configurationAccessor) {
         try {
             dockerClient.rmContainers(configurationAccessor);
             application.after();
@@ -78,7 +75,7 @@ public class XQueryTest extends ShardFixture {
     }
 
     @Test
-    public void xquery() throws Exception {
+    public void xquerySize() throws Exception {
         setupStorage(application.getConfiguration());
 
         Client client = JerseyClientBuilder.createClient();
@@ -91,18 +88,23 @@ public class XQueryTest extends ShardFixture {
 
         logger.info(xqueryResponse.getXqueryResponse());
 
-        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = builderFactory.newDocumentBuilder();
-        Document xmlDocument = builder.parse(new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        NodeList nodeList = (NodeList) xPath.compile("/xqueryResponse/shard").evaluate(xmlDocument, XPathConstants.NODESET);
+        Document xmlDocument = documentBuilder.parse(
+                new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
 
+        NodeList nodeList = (NodeList) xPath.compile(
+                "/xqueryResponse/shard").evaluate(xmlDocument,
+                XPathConstants.NODESET);
+
+        org.junit.jupiter.api.Assertions.assertEquals(2, nodeList.getLength());
+
+        int cumulativeSize = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-            NamedNodeMap attrs = node.getAttributes();
-            logger.debug(attrs.getNamedItem("id").getNodeValue());
-            logger.debug(node.getFirstChild().getTextContent());
+                    Assertions.assertThat(node.getAttributes().getNamedItem("id").getNodeValue()).isNotEmpty();
+
+            cumulativeSize += Integer.parseInt(node.getFirstChild().getTextContent().replaceAll("\\s",""));
         }
-        Assertions.assertThat(xqueryResponse.getXqueryResponse()).isNotEmpty();
+
+        org.junit.jupiter.api.Assertions.assertEquals(4, cumulativeSize);
     }
 }

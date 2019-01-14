@@ -22,12 +22,12 @@ logging:
     xqa: DEBUG
   appenders:
     - type: console
-    - type: file
-      currentLogFilename: ./logs/application.log
-      archivedLogFilenamePattern: ./logs/application-%d-%i.log.gz
-      archive: true
-      archivedFileCount: 7
-      maxFileSize: 1mb
+#    - type: file
+#      currentLogFilename: ./logs/application.log
+#      archivedLogFilenamePattern: ./logs/application-%d-%i.log.gz
+#      archive: true
+#      archivedFileCount: 7
+#      maxFileSize: 1mb
 
 messageBroker:
   host: xqa-message-broker

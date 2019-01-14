@@ -51,7 +51,8 @@ public class QueryBalancerEvent {
 
     public enum State {
         @JsonProperty("START")
-        START, @JsonProperty("END")
+        START,
+        @JsonProperty("END")
         END
     }
 }
