@@ -7,7 +7,7 @@ define API & test it
 
 /search == returns everything
 /search/filename/{filename} i.e. DBER-1923-0416.xml
-/search/digest/{digest} i.e. d6f04c98816
+/search/digest/{digest} i.e. d6f04c988162284ff57c06e69
 /search/service/{id} i.e. ingest/02bd02c2 / ingestbalancer/6336fca0 / shard/ee251962
 
 4. /xquery/{xquery}

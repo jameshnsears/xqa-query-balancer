@@ -18,9 +18,13 @@ import xqa.api.search.SearchResult;
 import xqa.integration.fixtures.DatabaseFixture;
 
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +84,7 @@ public class SearchTest extends DatabaseFixture {
     }
 
     @Test
-    public void searchFailure() throws Exception {
+    public void searchFailure() throws SQLException, ClassNotFoundException {
         storageEmpty();
 
         Assertions.assertEquals(204,
@@ -90,16 +94,17 @@ public class SearchTest extends DatabaseFixture {
     }
 
     @Test
-    public void searchFilename() throws Exception {
+    public void searchFilename() throws SQLException, ClassNotFoundException, IOException {
+        storageEmpty();
         storagePopulate();
 
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> client
+        assertThatExceptionOfType(NotFoundException.class).isThrownBy(() -> client
                 .target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename/")
                 .request()
-                .get(SearchResponse.class)).withMessage("HTTP 400 Bad Request");
+                .get(SearchResponse.class)).withMessage("HTTP 404 Not Found");
 
         final SearchResponse searchResponse = client
-                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename/xml/DAQU-1931-0321.xml")
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename//xml/DAQU-1931-0321.xml")
                 .request()
                 .get(SearchResponse.class);
 
@@ -115,5 +120,44 @@ public class SearchTest extends DatabaseFixture {
         Response response = target.request().get();
 
         Assertions.assertEquals(204, response.getStatus());
+    }
+
+    @Test
+    public void searchDigest() throws SQLException, ClassNotFoundException, IOException {
+        storageEmpty();
+        storagePopulate();
+
+        final SearchResponse searchResponse = client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/digest/d6f04c988162284ff57c06e69")
+                .request()
+                .get(SearchResponse.class);
+
+        Assertions.assertEquals(3, searchResponse.getSearchResponse().size());
+
+        final String expected = objectMapper.writeValueAsString(
+                objectMapper.readValue(fixture("response/searchDigest.json"), SearchResult[].class));
+
+        assertThat(objectMapper.writeValueAsString(searchResponse.getSearchResponse()))
+                .isEqualTo(expected);
+    }
+
+    @Test
+    public void searchService() throws SQLException, ClassNotFoundException, IOException {
+        storageEmpty();
+        storagePopulate();
+
+        final SearchResponse searchResponse = client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/service/ingest/d6d26946")
+                .request()
+                .get(SearchResponse.class);
+
+        Assertions.assertNotNull(searchResponse);
+        Assertions.assertEquals(40, searchResponse.getSearchResponse().size());
+
+        final String expected = objectMapper.writeValueAsString(
+                objectMapper.readValue(fixture("response/searchService.json"), SearchResult[].class));
+
+        assertThat(objectMapper.writeValueAsString(searchResponse.getSearchResponse()))
+                .isEqualTo(expected);
     }
 }

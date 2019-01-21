@@ -35,7 +35,7 @@ public class DatabaseFixture extends Containerisation {
         return Thread.currentThread().getContextClassLoader().getResource("database").getPath();
     }
 
-    protected void storagePopulate() throws Exception {
+    protected void storagePopulate() throws SQLException, ClassNotFoundException, IOException {
         Connection connection = getConnection();
         populate(connection);
         connection.close();
@@ -49,7 +49,7 @@ public class DatabaseFixture extends Containerisation {
                 application.getConfiguration().getDataSourceFactory().getPassword());
     }
 
-    protected void storageEmpty() throws Exception {
+    protected void storageEmpty() throws SQLException, ClassNotFoundException {
         Connection connection = getConnection();
         truncate(connection);
         connection.close();

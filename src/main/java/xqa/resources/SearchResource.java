@@ -1,7 +1,10 @@
 package xqa.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.Query;
+import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xqa.api.search.SearchDigestReponse;
@@ -17,6 +20,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,13 +60,19 @@ public class SearchResource {
 
     private List<SearchResult> getSearchResults(final String sql) {
         List<SearchResult> searchResults = jdbi.withHandle(handle -> {
-                logger.info(sql);
-                return handle.createQuery(sql).map((rs, ctx) -> new SearchResult(
+            logger.info(sql);
+            List<SearchResult> results = new ArrayList<>();
+            try {
+                results = handle.createQuery(sql).map((rs, ctx) -> new SearchResult(
                         rs.getString("creationTime"),
                         rs.getString("filename"),
                         rs.getString("digest"),
                         rs.getString("service"))).list();
-            });
+            } catch (UnableToExecuteStatementException exception) {
+                logger.error(exception.getMessage());
+            }
+            return results;
+        });
 
         if (searchResults.isEmpty()) {
             throw new WebApplicationException("No results available", Response.Status.NO_CONTENT);  // 204
@@ -73,7 +83,7 @@ public class SearchResource {
 
     @GET
     @Timed
-    @Path("/filename{filename : .+}")
+    @Path("/filename/{filename : .+}")
     public synchronized SearchFilenameResponse filename(
             @PathParam("filename") Optional<String> filename) {
         if (filename.get().equals("/")) {
@@ -105,7 +115,7 @@ public class SearchResource {
 
     @GET
     @Timed
-    @Path("/digest{digest : .+}")
+    @Path("/digest/{digest : .+}")
     public synchronized SearchDigestReponse digest(
             @PathParam("digest") Optional<String> digest) {
         if (digest.get().isEmpty()) {
@@ -136,7 +146,7 @@ public class SearchResource {
 
     @GET
     @Timed
-    @Path("/service{serviceId : .+}")
+    @Path("/service/{serviceId : .+}")
     public synchronized SearchServiceReponse service(
             @PathParam("serviceId") Optional<String> serviceId) {
         if (serviceId.get().isEmpty()) {
@@ -147,8 +157,8 @@ public class SearchResource {
         logger.debug("serviceId={}", serviceId.get());
 
         String sql ="select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
-                + "info->>'source' as filename "
-                + "info->>'digest' as digest "
+                + "info->>'source' as filename, "
+                + "info->>'digest' as digest, "
                 + "info->>'serviceId' as service "
                 + "from events "
                 + "where info->>'serviceId' like '%" + serviceId.get()+ "%' and info->>'state' = 'START' "
