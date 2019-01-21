@@ -27,25 +27,31 @@ public class DatabaseFixture extends Containerisation {
     protected static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class,
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
-
-    protected static Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
-
     protected static final ObjectMapper objectMapper = Jackson.newObjectMapper();
-
+    protected static Logger logger = LoggerFactory.getLogger(DatabaseFixture.class);
     protected static DockerClient dockerClient;
 
     private String getResource() {
         return Thread.currentThread().getContextClassLoader().getResource("database").getPath();
     }
 
-    protected void setupStorage() throws Exception {
+    protected void storagePopulate() throws Exception {
+        Connection connection = getConnection();
+        populate(connection);
+        connection.close();
+    }
+
+    private Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName(application.getConfiguration().getDataSourceFactory().getDriverClass());
-        Connection connection = DriverManager.getConnection(
+        return DriverManager.getConnection(
                 application.getConfiguration().getDataSourceFactory().getUrl(),
                 application.getConfiguration().getDataSourceFactory().getUser(),
                 application.getConfiguration().getDataSourceFactory().getPassword());
+    }
+
+    protected void storageEmpty() throws Exception {
+        Connection connection = getConnection();
         truncate(connection);
-        populate(connection);
         connection.close();
     }
 
@@ -85,7 +91,6 @@ public class DatabaseFixture extends Containerisation {
         try (Stream<String> stream = Files.lines(filePath)) {
             stream.forEach(line -> {
                 try {
-                    logger.debug(line);
                     executeSql(connection, line);
                 } catch (SQLException exception) {
                     logger.error(exception.getMessage());

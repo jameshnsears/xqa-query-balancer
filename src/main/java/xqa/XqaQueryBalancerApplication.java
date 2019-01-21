@@ -1,20 +1,19 @@
 package xqa;
 
-import java.util.UUID;
-
-import org.jdbi.v3.core.Jdbi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xqa.health.QueryBalancerHealthCheck;
 import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
+
+import java.util.UUID;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
     private static final Logger logger = LoggerFactory.getLogger(SearchResource.class);

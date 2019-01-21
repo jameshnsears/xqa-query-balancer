@@ -7,18 +7,20 @@ import com.github.jameshnsears.configuration.ConfigurationAccessor;
 import com.github.jameshnsears.docker.DockerClient;
 import io.dropwizard.jackson.Jackson;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.junit.jupiter.api.*;
-
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xqa.integration.fixtures.DatabaseFixture;
 import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
-
-
+import xqa.integration.fixtures.DatabaseFixture;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
 
 import static io.dropwizard.testing.FixtureHelpers.fixture;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,12 +29,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SearchTest extends DatabaseFixture {
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
+    private final Client client = JerseyClientBuilder.createClient();
 
     @BeforeAll
     public static void startContainers(final ConfigurationAccessor configurationAccessor) {
         dockerClient = new DockerClient();
 
-        LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
@@ -57,40 +60,60 @@ public class SearchTest extends DatabaseFixture {
 
     @Test
     public void search() throws Exception {
-        setupStorage();
+        storageEmpty();
+        storagePopulate();
 
-        Client client = JerseyClientBuilder.createClient();
-
-        final SearchResponse searchResponse = client
-                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/d6f04c9881").request()
+        final SearchResponse searchWithoutTrailingSlash = client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search")
+                .request()
                 .get(SearchResponse.class);
 
+        Assertions.assertEquals(240, searchWithoutTrailingSlash.getSearchResponse().size());
+
+        final SearchResponse searchWithTrailingSlash = client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/")
+                .request()
+                .get(SearchResponse.class);
+
+        Assertions.assertEquals(objectMapper.writeValueAsString(searchWithoutTrailingSlash.getSearchResponse()),
+                objectMapper.writeValueAsString(searchWithTrailingSlash.getSearchResponse()));
+    }
+
+    @Test
+    public void searchFailure() throws Exception {
+        storageEmpty();
+
+        Assertions.assertEquals(204,
+                client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search")
+                .request().get().getStatus());
+    }
+
+    @Test
+    public void searchFilename() throws Exception {
+        storagePopulate();
+
+        assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename/")
+                .request()
+                .get(SearchResponse.class)).withMessage("HTTP 400 Bad Request");
+
+        final SearchResponse searchResponse = client
+                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename/xml/DAQU-1931-0321.xml")
+                .request()
+                .get(SearchResponse.class);
+
+        Assertions.assertEquals(1, searchResponse.getSearchResponse().size());
+
         final String expected = objectMapper.writeValueAsString(
-                objectMapper.readValue(fixture("response/search.json"), SearchResult[].class));
+            objectMapper.readValue(fixture("response/searchFilename.json"), SearchResult[].class));
 
         assertThat(objectMapper.writeValueAsString(searchResponse.getSearchResponse()))
                 .isEqualTo(expected);
-    }
 
-    @Test
-    public void searchFailure() {
-        Client client = JerseyClientBuilder.createClient();
+        WebTarget target = client.target("http://127.0.0.1:" + application.getLocalPort() + "/search/filename/blah");
+        Response response = target.request().get();
 
-        assertThatExceptionOfType(BadRequestException.class).isThrownBy(() -> client
-                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/0123456789").request()
-                .get(SearchResponse.class)).withMessage("HTTP 400 Bad Request");
-    }
-
-    @Test
-    public void searchWithSlash() throws Exception {
-        setupStorage();
-
-        Client client = JerseyClientBuilder.createClient();
-
-        final SearchResponse searchResponse = client
-                .target("http://127.0.0.1:" + application.getLocalPort() + "/search/shard/e540188c")
-                .request().get(SearchResponse.class);
-
-        Assertions.assertEquals(40, searchResponse.getSearchResponse().size());
+        Assertions.assertEquals(204, response.getStatus());
     }
 }

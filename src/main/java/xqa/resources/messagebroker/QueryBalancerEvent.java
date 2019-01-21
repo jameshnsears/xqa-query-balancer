@@ -1,8 +1,8 @@
 package xqa.resources.messagebroker;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Date;
 
 public class QueryBalancerEvent {
     private String serviceId = "";

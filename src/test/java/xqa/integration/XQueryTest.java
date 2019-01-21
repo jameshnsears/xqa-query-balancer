@@ -12,7 +12,9 @@ import io.dropwizard.testing.ResourceHelpers;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +22,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import xqa.integration.fixtures.ShardFixture;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
+import xqa.integration.fixtures.ShardFixture;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -48,7 +50,7 @@ public class XQueryTest extends ShardFixture {
     public static void startContainers(final ConfigurationAccessor configurationAccessor) {
         dockerClient = new DockerClient();
 
-        LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
@@ -100,9 +102,9 @@ public class XQueryTest extends ShardFixture {
         int cumulativeSize = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-                    Assertions.assertThat(node.getAttributes().getNamedItem("id").getNodeValue()).isNotEmpty();
+            Assertions.assertThat(node.getAttributes().getNamedItem("id").getNodeValue()).isNotEmpty();
 
-            cumulativeSize += Integer.parseInt(node.getFirstChild().getTextContent().replaceAll("\\s",""));
+            cumulativeSize += Integer.parseInt(node.getFirstChild().getTextContent().replaceAll("\\s", ""));
         }
 
         org.junit.jupiter.api.Assertions.assertEquals(4, cumulativeSize);

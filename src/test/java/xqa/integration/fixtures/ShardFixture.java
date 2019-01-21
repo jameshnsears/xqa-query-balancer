@@ -24,14 +24,11 @@ import java.util.stream.Stream;
 
 public class ShardFixture extends Containerisation {
     private static final Logger logger = LoggerFactory.getLogger(ShardFixture.class);
-
-    private MessageBrokerConfiguration messageBrokerConfiguration;
-
-    private MessageBroker messageBroker;
-
-    protected DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
     protected DocumentBuilder documentBuilder;
     protected XPath xPath = XPathFactory.newInstance().newXPath();
+    private MessageBrokerConfiguration messageBrokerConfiguration;
+    private MessageBroker messageBroker;
 
     public ShardFixture() {
         try {
