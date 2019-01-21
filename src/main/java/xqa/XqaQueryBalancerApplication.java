@@ -49,8 +49,9 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
         final JdbiFactory factory = new JdbiFactory();
         final Jdbi jdbi = factory.build(environment, configuration.getDataSourceFactory(),
                 "postgresql");
-        environment.jersey().register(new SearchResource(jdbi));
 
+        environment.jersey()
+                .register(new SearchResource(jdbi));
         environment.jersey()
                 .register(new XQueryResource(configuration.getMessageBrokerConfiguration(), serviceId));
     }

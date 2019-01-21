@@ -19,3 +19,8 @@ define API & test it
 
 
 4. materialised, across n shards, xquery
+
+--
+
+XQueryReurce need bulletproffing - what happens if messagebroker disappers?
+= we need to reconnect

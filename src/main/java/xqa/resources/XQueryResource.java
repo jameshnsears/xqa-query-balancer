@@ -33,7 +33,6 @@ import java.util.UUID;
 @Produces(MediaType.APPLICATION_JSON)
 public class XQueryResource {
     private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
-
     private final String serviceId;
     private TemporaryQueue shardReplyToQueue;
     private MessageBroker messageBroker;
@@ -42,21 +41,27 @@ public class XQueryResource {
     private int shardResponseTimeout;
     private int shardResponseSecondaryTimeout;
 
-    public XQueryResource(MessageBrokerConfiguration messageBrokerConfiguration, String serviceId)
+    public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration,
+                          final String serviceId)
             throws InterruptedException, MessageBroker.MessageBrokerException {
         synchronized (this) {
             this.serviceId = serviceId;
 
-            messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
-                    messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
-                    messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
-
-            auditDestination = messageBrokerConfiguration.getAuditDestination();
-            xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
+            initMessageBroker(messageBrokerConfiguration);
 
             shardResponseTimeout = messageBrokerConfiguration.getShardResponseTimeout();
             shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
         }
+    }
+
+    public void initMessageBroker(final MessageBrokerConfiguration messageBrokerConfiguration)
+            throws InterruptedException, MessageBroker.MessageBrokerException {
+        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
+                messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
+                messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
+
+        auditDestination = messageBrokerConfiguration.getAuditDestination();
+        xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
     }
 
     @POST
@@ -81,17 +86,12 @@ public class XQueryResource {
             sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
         } catch (Exception exception) {
             logger.error(exception.getMessage());
-            System.exit(1);
-        } finally {
-            synchronized (this) {
-                messageBroker.close();
-            }
         }
 
         return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }
 
-    private synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
+    public synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
                                              String correlationId, String xquery)
             throws JMSException, JsonProcessingException, MessageBroker.MessageBrokerException {
         QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
@@ -106,7 +106,7 @@ public class XQueryResource {
         messageBroker.sendMessage(message);
     }
 
-    private synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery,
+    public synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery,
                                                  String correlationId)
             throws JMSException, MessageBroker.MessageBrokerException {
         shardReplyToQueue = messageBroker.createTemporaryQueue();
@@ -118,7 +118,7 @@ public class XQueryResource {
         messageBroker.sendMessage(message);
     }
 
-    private synchronized List<Message> collectShardXQueryResponses() throws JMSException {
+    public synchronized List<Message> collectShardXQueryResponses() throws JMSException {
         return messageBroker.receiveMessagesTemporaryQueue(shardReplyToQueue, shardResponseTimeout,
                 shardResponseSecondaryTimeout);
     }

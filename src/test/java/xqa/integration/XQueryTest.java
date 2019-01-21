@@ -9,10 +9,8 @@ import com.github.jameshnsears.docker.DockerClient;
 import io.dropwizard.jackson.Jackson;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import org.assertj.core.api.Assertions;
-import org.glassfish.jersey.client.ClientProperties;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +27,7 @@ import xqa.api.xquery.XQueryResponse;
 import xqa.integration.fixtures.ShardFixture;
 
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.xml.xpath.XPathConstants;
@@ -41,10 +40,9 @@ public class XQueryTest extends ShardFixture {
             ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
     private static final Logger logger = LoggerFactory.getLogger(SearchTest.class);
-
-    private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
-
     private static DockerClient dockerClient;
+    private Client client = ClientBuilder.newClient();
+    private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
 
     @BeforeAll
     public static void startContainers(final ConfigurationAccessor configurationAccessor) {
@@ -79,34 +77,89 @@ public class XQueryTest extends ShardFixture {
     @Test
     public void xquerySize() throws Exception {
         setupStorage(application.getConfiguration());
-
-        Client client = JerseyClientBuilder.createClient();
-
         final XQueryResponse xqueryResponse = client
-                .property(ClientProperties.READ_TIMEOUT, 10000)
                 .target("http://0.0.0.0:" + application.getLocalPort() + "/xquery")
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("count(/)")))
                 .readEntity(XQueryResponse.class);
 
+        /*
+        <xqueryResponse>
+            <shard id='8d356dbe'>
+            2
+            </shard>
+            <shard id='5cb35499'>
+            2
+            </shard>
+        </xqueryResponse>
+         */
+
         logger.info(xqueryResponse.getXqueryResponse());
 
-        Document xmlDocument = documentBuilder.parse(
-                new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
 
-        NodeList nodeList = (NodeList) xPath.compile(
-                "/xqueryResponse/shard").evaluate(xmlDocument,
-                XPathConstants.NODESET);
+        final XQueryResponse x = client
+                .target("http://0.0.0.0:" + application.getLocalPort() + "/xquery")
+                .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("/chapter/metadataInfo/PSMID")))
+                .readEntity(XQueryResponse.class);
 
-        org.junit.jupiter.api.Assertions.assertEquals(2, nodeList.getLength());
+        /*
+        <xqueryResponse>
+            <shard id='e9496a00'>
+                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1949_1705_000_0000</PSMID>
+            </shard>
+            <shard id='2c24cfc9'>
+                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1943_0958_000_0000</PSMID>
+            </shard>
+        </xqueryResponse>
+         */
 
+        logger.info(x.getXqueryResponse());
+
+
+
+//        Document xmlDocument = documentBuilder.parse(
+//                new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
+//
+//        NodeList nodeList = (NodeList) xPath.compile(
+//                "/xqueryResponse/shard").evaluate(xmlDocument,
+//                XPathConstants.NODESET);
+//
+//        Assertions.assertEquals(2, nodeList.getLength());
+//
+//        assertShardsCumulativeSize(nodeList);
+    }
+
+    private void assertShardsCumulativeSize(NodeList nodeList) {
         int cumulativeSize = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
             Node node = nodeList.item(i);
-            Assertions.assertThat(node.getAttributes().getNamedItem("id").getNodeValue()).isNotEmpty();
+            Assertions.assertEquals(false, node.getAttributes().getNamedItem("id").getNodeValue().isEmpty());
 
             cumulativeSize += Integer.parseInt(node.getFirstChild().getTextContent().replaceAll("\\s", ""));
         }
 
-        org.junit.jupiter.api.Assertions.assertEquals(4, cumulativeSize);
+        Assertions.assertEquals(4, cumulativeSize);
     }
+
+    //@Test
+    public void xqueryContent() throws Exception {
+        final XQueryResponse xqueryResponse = client
+                .target("http://0.0.0.0:" + application.getLocalPort() + "/xquery")
+                .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("/chapter/metadataInfo/PSMID")))
+                .readEntity(XQueryResponse.class);
+
+        /*
+        <xqueryResponse>
+            <shard id='e9496a00'>
+                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1949_1705_000_0000</PSMID>
+            </shard>
+            <shard id='2c24cfc9'>
+                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1943_0958_000_0000</PSMID>
+            </shard>
+        </xqueryResponse>
+         */
+
+        logger.info(xqueryResponse.getXqueryResponse());
+
+    }
+
 }

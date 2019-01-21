@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.jameshnsears.configuration.ConfigurationAccessor;
 import com.github.jameshnsears.docker.DockerClient;
 import io.dropwizard.jackson.Jackson;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,12 +16,11 @@ import xqa.api.search.SearchResponse;
 import xqa.api.search.SearchResult;
 import xqa.integration.fixtures.DatabaseFixture;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -33,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SearchTest extends DatabaseFixture {
     private static final ObjectMapper objectMapper = Jackson.newObjectMapper();
-    private final Client client = JerseyClientBuilder.createClient();
+    private final Client client = ClientBuilder.newClient();
 
     @BeforeAll
     public static void startContainers(final ConfigurationAccessor configurationAccessor) {

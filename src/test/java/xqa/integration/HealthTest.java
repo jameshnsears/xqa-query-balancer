@@ -24,8 +24,6 @@ import xqa.integration.fixtures.Containerisation;
 import java.io.IOException;
 import java.net.URL;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 @ExtendWith(ConfigurationParameterResolver.class)
 public class HealthTest extends Containerisation {
     private static final DropwizardTestSupport<XqaQueryBalancerConfiguration> application = new DropwizardTestSupport<>(

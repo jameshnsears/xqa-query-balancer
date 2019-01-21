@@ -56,7 +56,7 @@ public class ShardFixture extends Containerisation {
     }
 
     private void waitForDataToGetInsertedIntoShards() throws InterruptedException {
-        Thread.sleep(15000);
+        Thread.sleep(10000);
     }
 
     private void populateShards() throws IOException {

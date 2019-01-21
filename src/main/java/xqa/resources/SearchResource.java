@@ -1,9 +1,7 @@
 package xqa.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
-import org.jdbi.v3.core.statement.Query;
 import org.jdbi.v3.core.statement.UnableToExecuteStatementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +91,7 @@ public class SearchResource {
 
         logger.debug("filename={}", filename.get());
 
-        String sql ="select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+        String sql = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
                 + "info->>'source' as filename, "
                 + "info->>'digest' as digest, "
                 + "info->>'serviceId' as service "
@@ -125,7 +123,7 @@ public class SearchResource {
 
         logger.debug("digest={}", digest.get());
 
-        String sql ="select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+        String sql = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
                 + "info->>'source' as filename, "
                 + "info->>'digest' as digest, "
                 + "info->>'serviceId' as service "
@@ -156,12 +154,12 @@ public class SearchResource {
 
         logger.debug("serviceId={}", serviceId.get());
 
-        String sql ="select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+        String sql = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
                 + "info->>'source' as filename, "
                 + "info->>'digest' as digest, "
                 + "info->>'serviceId' as service "
                 + "from events "
-                + "where info->>'serviceId' like '%" + serviceId.get()+ "%' and info->>'state' = 'START' "
+                + "where info->>'serviceId' like '%" + serviceId.get() + "%' and info->>'state' = 'START' "
                 + "order by creationTime asc;";
 
         List<SearchResult> searchResults = getSearchResults(sql);
