@@ -81,8 +81,8 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/filename/{filename : .+}")
-    public SearchFilenameResponse filename(final @PathParam("filename") Optional<String> filename) {
-        final String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename.get()
+    public SearchFilenameResponse filename(final @PathParam("filename") String filename) {
+        final String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename
                 + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
@@ -99,8 +99,8 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/digest/{digest : .+}")
-    public SearchDigestReponse digest(final @PathParam("digest") Optional<String> digest) {
-        final String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest.get()
+    public SearchDigestReponse digest(final @PathParam("digest") String digest) {
+        final String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest
                 + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
@@ -117,8 +117,8 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/service/{serviceId : .+}")
-    public SearchServiceReponse service(final @PathParam("serviceId") Optional<String> serviceId) {
-        final String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId.get()
+    public SearchServiceReponse service(final @PathParam("serviceId") String serviceId) {
+        final String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId
                 + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
