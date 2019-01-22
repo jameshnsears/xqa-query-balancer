@@ -29,7 +29,7 @@ public class DatabaseFixture extends Containerisation {
     protected static final DropwizardTestSupport<XqaQueryBalancerConfiguration> APPLICATION = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class, ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
     protected static final ObjectMapper OBJECTMAPPER = Jackson.newObjectMapper();
-    protected static Logger LOGGER = LoggerFactory.getLogger(DatabaseFixture.class);
+    protected static final Logger LOGGER = LoggerFactory.getLogger(DatabaseFixture.class);
     protected static DockerClient dockerClient;
 
     private String getResource() {
@@ -37,9 +37,15 @@ public class DatabaseFixture extends Containerisation {
     }
 
     protected void storagePopulate() throws SQLException, ClassNotFoundException, IOException {
-        Connection connection = getConnection();
-        populate(connection);
-        connection.close();
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            populate(connection);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
     }
 
     private Connection getConnection() throws ClassNotFoundException, SQLException {
@@ -50,37 +56,37 @@ public class DatabaseFixture extends Containerisation {
     }
 
     protected void storageEmpty() throws SQLException, ClassNotFoundException {
-        Connection connection = getConnection();
+        final Connection connection = getConnection();
         truncate(connection);
         connection.close();
     }
 
-    private void populate(Connection connection) throws IOException {
+    private void populate(final Connection connection) throws IOException {
         try (Stream<Path> filePathStream = Files.walk(Paths.get(getResource()))) {
             filePathStream.forEach(filePath -> {
                 if (Files.isRegularFile(filePath)) {
                     try {
                         insertFileContentsIntoDatabase(connection, filePath);
-                    } catch (Exception exception) {
-                        LOGGER.error(exception.getMessage());
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage());
                     }
                 }
             });
         }
     }
 
-    private void truncate(Connection connection) throws SQLException{
+    private void truncate(final Connection connection) throws SQLException{
         executeSql(connection, "truncate events;");
     }
 
-    private void executeSql(Connection connection, String sql) throws SQLException {
+    private void executeSql(final Connection connection, final String sql) throws SQLException {
         Statement statement;
         statement = connection.createStatement();
         statement.execute(sql);
         statement.close();
     }
 
-    private void insertFileContentsIntoDatabase(Connection connection, Path filePath) throws Exception {
+    private void insertFileContentsIntoDatabase(final Connection connection, final Path filePath) throws IOException {
         LOGGER.debug(filePath.toString());
 
         try (Stream<String> stream = Files.lines(filePath)) {

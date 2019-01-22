@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,14 +26,15 @@ import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 
 public class ShardFixture extends Containerisation {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ShardFixture.class);
-    private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    protected static final Logger LOGGER = LoggerFactory.getLogger(ShardFixture.class);
     protected DocumentBuilder documentBuilder;
     protected XPath xPath = XPathFactory.newInstance().newXPath();
+    private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
     private MessageBrokerConfiguration messageBrokerConfiguration;
     private MessageBroker messageBroker;
 
     public ShardFixture() throws ParserConfigurationException {
+        super();
         documentBuilder = documentBuilderFactory.newDocumentBuilder();
     }
 
@@ -40,7 +42,7 @@ public class ShardFixture extends Containerisation {
         return Thread.currentThread().getContextClassLoader().getResource("shard").getPath();
     }
 
-    protected void setupStorage(XqaQueryBalancerConfiguration configuration) throws Exception {
+    protected void setupStorage(final XqaQueryBalancerConfiguration configuration) throws Exception {
         messageBrokerConfiguration = configuration.getMessageBrokerConfiguration();
 
         messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
@@ -71,9 +73,9 @@ public class ShardFixture extends Containerisation {
         }
     }
 
-    private void insertFileContentsIntoShard(Path filePath) throws Exception {
+    private void insertFileContentsIntoShard(final Path filePath) throws JMSException, IOException, MessageBroker.MessageBrokerException {
         LOGGER.debug(filePath.toString());
-        Message message = MessageMaker.createMessage(messageBroker.getSession(),
+        final Message message = MessageMaker.createMessage(messageBroker.getSession(),
                 messageBroker.getSession().createQueue(messageBrokerConfiguration.getIngestDestination()),
                 UUID.randomUUID().toString(), filePath.toString(),
                 FileUtils.readFileToString(filePath.toFile(), StandardCharsets.UTF_8));

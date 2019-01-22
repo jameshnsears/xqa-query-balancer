@@ -30,13 +30,12 @@ import xqa.api.search.SearchServiceReponse;
 public class SearchResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResource.class);
     private final Jdbi jdbi;
-
-    private final String SQLSELECT = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+    private final String sqlselect = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
             + "info->>'source' as filename, " + "info->>'digest' as digest, " + "info->>'serviceId' as service ";
-    private final String SQLFROM = "from events ";
-    private final String SQLORDERBY = "order by creationTime asc;";
+    private final String sqlfrom = "from events ";
+    private final String sqlorderby = "order by creationTime asc;";
 
-    public SearchResource(Jdbi jdbi) {
+    public SearchResource(final Jdbi jdbi) {
         synchronized (this) {
             this.jdbi = jdbi;
         }
@@ -44,14 +43,13 @@ public class SearchResource {
 
     @GET
     @Timed
-    @Path("/")
-    public synchronized SearchResponse search() {
-        String sql = SQLSELECT + SQLFROM + SQLORDERBY;
+    public SearchResponse search() {
+        final String sql = sqlselect + sqlfrom + sqlorderby;
 
-        List<SearchResult> searchResults = getSearchResults(sql);
+        final List<SearchResult> searchResults = getSearchResults(sql);
 
-        SearchResponse searchResponse = new SearchResponse();
-        for (SearchResult searchResult : searchResults) {
+        final SearchResponse searchResponse = new SearchResponse();
+        for (final SearchResult searchResult : searchResults) {
             searchResponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
                     searchResult.getServiceId(), searchResult.getSubject(), searchResult.getdigest()));
         }
@@ -59,13 +57,14 @@ public class SearchResource {
         return searchResponse;
     }
 
-    private List<SearchResult> getSearchResults(final String sql) {
-        List<SearchResult> searchResults = jdbi.withHandle(handle -> {
+    private synchronized List<SearchResult> getSearchResults(final String sql) {
+        final List<SearchResult> searchResults = jdbi.withHandle(handle -> {
             LOGGER.info(sql);
             List<SearchResult> results = new ArrayList<>();
             try {
                 results = handle.createQuery(sql).map((rs, ctx) -> new SearchResult(rs.getString("creationTime"),
                         rs.getString("filename"), rs.getString("digest"), rs.getString("service"))).list();
+                LOGGER.info(String.format("results.size=%s", results.size()));
             } catch (UnableToExecuteStatementException exception) {
                 LOGGER.error(exception.getMessage());
             }
@@ -82,7 +81,7 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/filename/{filename : .+}")
-    public synchronized SearchFilenameResponse filename(@PathParam("filename") Optional<String> filename) {
+    public SearchFilenameResponse filename(final @PathParam("filename") Optional<String> filename) {
         if (!filename.isPresent()) {
             LOGGER.warn("filename missing");
             throw new WebApplicationException("filename missing", Response.Status.BAD_REQUEST);
@@ -90,13 +89,13 @@ public class SearchResource {
 
         LOGGER.debug("filename={}", filename.get());
 
-        String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename.get()
-                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQLORDERBY;
+        final String sql = sqlselect + sqlfrom + "where info->>'source' like '%" + filename.get()
+                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + sqlorderby;
 
-        List<SearchResult> searchResults = getSearchResults(sql);
+        final List<SearchResult> searchResults = getSearchResults(sql);
 
-        SearchFilenameResponse searchFilenameResponse = new SearchFilenameResponse();
-        for (SearchResult searchResult : searchResults) {
+        final SearchFilenameResponse searchFilenameResponse = new SearchFilenameResponse();
+        for (final SearchResult searchResult : searchResults) {
             searchFilenameResponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
                     searchResult.getServiceId(), searchResult.getSubject(), searchResult.getdigest()));
         }
@@ -107,7 +106,7 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/digest/{digest : .+}")
-    public synchronized SearchDigestReponse digest(@PathParam("digest") Optional<String> digest) {
+    public SearchDigestReponse digest(final @PathParam("digest") Optional<String> digest) {
         if (!digest.isPresent()) {
             LOGGER.warn("digest missing");
             throw new WebApplicationException("digest missing", Response.Status.BAD_REQUEST);
@@ -115,13 +114,13 @@ public class SearchResource {
 
         LOGGER.debug("digest={}", digest.get());
 
-        String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest.get()
-                + "%' and info->>'state' = 'START' " + SQLORDERBY;
+        final String sql = sqlselect + sqlfrom + "where info->>'digest' like '%" + digest.get()
+                + "%' and info->>'state' = 'START' " + sqlorderby;
 
-        List<SearchResult> searchResults = getSearchResults(sql);
+        final List<SearchResult> searchResults = getSearchResults(sql);
 
-        SearchDigestReponse searchDigestReponse = new SearchDigestReponse();
-        for (SearchResult searchResult : searchResults) {
+        final SearchDigestReponse searchDigestReponse = new SearchDigestReponse();
+        for (final SearchResult searchResult : searchResults) {
             searchDigestReponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
                     searchResult.getServiceId(), searchResult.getSubject(), searchResult.getdigest()));
         }
@@ -132,7 +131,7 @@ public class SearchResource {
     @GET
     @Timed
     @Path("/service/{serviceId : .+}")
-    public synchronized SearchServiceReponse service(@PathParam("serviceId") Optional<String> serviceId) {
+    public SearchServiceReponse service(final @PathParam("serviceId") Optional<String> serviceId) {
         if (!serviceId.isPresent()) {
             LOGGER.warn("serviceId missing");
             throw new WebApplicationException("serviceId missing", Response.Status.BAD_REQUEST);
@@ -140,13 +139,13 @@ public class SearchResource {
 
         LOGGER.debug("serviceId={}", serviceId.get());
 
-        String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId.get()
-                + "%' and info->>'state' = 'START' " + SQLORDERBY;
+        final String sql = sqlselect + sqlfrom + "where info->>'serviceId' like '%" + serviceId.get()
+                + "%' and info->>'state' = 'START' " + sqlorderby;
 
-        List<SearchResult> searchResults = getSearchResults(sql);
+        final List<SearchResult> searchResults = getSearchResults(sql);
 
-        SearchServiceReponse searchServiceReponse = new SearchServiceReponse();
-        for (SearchResult searchResult : searchResults) {
+        final SearchServiceReponse searchServiceReponse = new SearchServiceReponse();
+        for (final SearchResult searchResult : searchResults) {
             searchServiceReponse.getSearchResponse().add(new SearchResult(searchResult.getCreationTime(),
                     searchResult.getServiceId(), searchResult.getSubject(), searchResult.getdigest()));
         }

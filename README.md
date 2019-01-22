@@ -14,24 +14,56 @@ Featuring:
 * See .travis.yml
 
 ### 2.2. CLI 
-* docker-compose up -d xqa-message-broker xqa-db xqa-ingest-balancer
-* docker-compose scale xqa-shard=2 
-* java -jar target/xqa-query-balancer-1.0.0-SNAPSHOT.jar server xqa-query-balancer.yml
+Populate xqa-shard(s) and xqa-db; assuming xqa-test available.
+```
+docker-compose up -d xqa-message-broker xqa-db xqa-db-amqp xqa-ingest-balancer
+docker-compose scale xqa-shard=2
+docker run -d --net="xqa-query-balancer_xqa" --name="xqa-ingest" -v $HOME/GIT_REPOS/xqa-test-data:/xml jameshnsears/xqa-ingest:latest -message_broker_host xqa-message-broker -path /xml
+```
+* wait until data in xqa:
+    * docker logs xqa-ingest | grep "FINISHED - sent: 40/40"
+    * docker-compose logs xqa-shard | grep "size="
+```
+docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:9090 -p9091:9091 xqa-query-balancer 
+```
 
-### 2.2.1. Endpoints from CLI
-* curl http://127.0.0.1:9090/search/shard/a510ab7f
+### 2.2.1. Search
+```
+{
+"searchResponse":
+    [
+        {
+            "creationTime":"2019-01-22 12:03:22.919+00",
+            "serviceId":"/xml/DBER-1923-0416.xml",
+            "subject":"aa84010cfefca52e93b61d528a4e869b0cc7b051fd627a072c0b38857d97d8b5",
+            "digest":"ingest/8d9d6ed5"
+        }
+    ]
+}
+```
+
+* curl http://127.0.0.1:9090/search
+* curl http://127.0.0.1:9090/search/filename/DBER-1923-0416.xml
+* curl http://127.0.0.1:9090/search/digest/d6f04c988162284ff57c06e69
+* curl http://127.0.0.1:9090/search/service/ingest
+
+### 2.2.2. XQuery
+```
+{"xqueryResponse":"<xqueryResponse>\n<shard id='26507201'>\n20\n</shard><shard id='dd929cc5'>\n20\n</shard></xqueryResponse>"}
+```
 * curl http://127.0.0.1:9090/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
-* curl -X POST http://127.0.0.1:9091/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
-* curl -X POST http://127.0.0.1:9091/tasks/gc
+### 2.2.3. Admin
 * curl http://127.0.0.1:9091/healthcheck
 * curl http://127.0.0.1:9091/metrics
+* curl -X POST http://127.0.0.1:9091/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
+* curl -X POST http://127.0.0.1:9091/tasks/gc
 
 ## 3. Teardown
 * docker-compose down -v
 
-## 4. Database Connectivity
-## 4.1. Empty BaseX Container database
+## 4. Storage
+## 4.1. BaseX
 * basexclient -U admin -P admin
 * open xqa
 * delete /

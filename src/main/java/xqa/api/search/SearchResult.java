@@ -11,7 +11,10 @@ public class SearchResult {
     public SearchResult() {
     }
 
-    public SearchResult(String creationTime, String serviceId, String subject, String digest) {
+    public SearchResult(final String creationTime,
+                        final String serviceId,
+                        final String subject,
+                        final String digest) {
         this.creationTime = creationTime;
         this.serviceId = serviceId;
         this.subject = subject;

@@ -10,7 +10,7 @@ public class XQueryRequest {
         // Jackson deserialization
     }
 
-    public XQueryRequest(String xqueryRequest) {
+    public XQueryRequest(final String xqueryRequest) {
         this.xqueryRequest = xqueryRequest;
     }
 

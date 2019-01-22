@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QueryBalancerEvent {
     private String serviceId = "";
-    private long creationTime = 0;
+    private long creationTime;
     private String correlationId = "";
     private String digest = "";
     private State state;

@@ -41,7 +41,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setHost(String host) {
+    public void setHost(final String host) {
         this.host = host;
     }
 
@@ -51,7 +51,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setXqueryDestination(String xqueryDestination) {
+    public void setXqueryDestination(final String xqueryDestination) {
         this.xqueryDestination = xqueryDestination;
     }
 
@@ -61,7 +61,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setAuditDestination(String auditDestination) {
+    public void setAuditDestination(final String auditDestination) {
         this.auditDestination = auditDestination;
     }
 
@@ -71,7 +71,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setUserName(String userName) {
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
@@ -81,7 +81,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setPassword(String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -91,7 +91,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setRetryAttempts(int retryAttempts) {
+    public void setRetryAttempts(final int retryAttempts) {
         this.retryAttempts = retryAttempts;
     }
 
@@ -101,7 +101,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setPort(int port) {
+    public void setPort(final int port) {
         this.port = port;
     }
 
@@ -111,7 +111,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setIngestDestination(String ingestDestination) {
+    public void setIngestDestination(final String ingestDestination) {
         this.ingestDestination = ingestDestination;
     }
 
@@ -121,7 +121,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setShardResponseTimeout(int shardResponseTimeout) {
+    public void setShardResponseTimeout(final int shardResponseTimeout) {
         this.shardResponseTimeout = shardResponseTimeout;
     }
 
@@ -131,7 +131,7 @@ public class MessageBrokerConfiguration {
     }
 
     @JsonProperty
-    public void setShardResponseSecondaryTimeout(int shardResponseSecondaryTimeout) {
+    public void setShardResponseSecondaryTimeout(final int shardResponseSecondaryTimeout) {
         this.shardResponseSecondaryTimeout = shardResponseSecondaryTimeout;
     }
 }

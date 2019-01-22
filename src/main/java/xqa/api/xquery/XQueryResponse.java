@@ -9,7 +9,7 @@ public class XQueryResponse {
         // Jackson deserialization
     }
 
-    public XQueryResponse(String xqueryResponse) {
+    public XQueryResponse(final String xqueryResponse) {
         this.xqueryResponse = xqueryResponse;
     }
 

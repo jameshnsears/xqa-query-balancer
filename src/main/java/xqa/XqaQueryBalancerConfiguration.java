@@ -21,7 +21,7 @@ public class XqaQueryBalancerConfiguration extends Configuration {
     }
 
     @JsonProperty("database")
-    public void setDataSourceFactory(DataSourceFactory factory) {
+    public void setDataSourceFactory(final DataSourceFactory factory) {
         this.database = factory;
     }
 
@@ -31,7 +31,7 @@ public class XqaQueryBalancerConfiguration extends Configuration {
     }
 
     @JsonProperty("messageBroker")
-    public void setMessageBrokerConfiguration(MessageBrokerConfiguration factory) {
+    public void setMessageBrokerConfiguration(final MessageBrokerConfiguration factory) {
         this.messageBrokerConfiguration = factory;
     }
 }

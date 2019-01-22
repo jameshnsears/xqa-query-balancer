@@ -3,8 +3,6 @@ package xqa;
 import java.util.UUID;
 
 import org.jdbi.v3.core.Jdbi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.dropwizard.Application;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -17,13 +15,11 @@ import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchResource.class);
     private final String serviceId;
 
     public XqaQueryBalancerApplication() {
         super();
-        serviceId = this.getClass().getSimpleName().toLowerCase() + "/" + UUID.randomUUID().toString().split("-")[0];
-        LOGGER.info(serviceId);
+        serviceId = "querybalancer/" + UUID.randomUUID().toString().split("-")[0];
     }
 
     public static void main(final String[] args) throws Exception {
@@ -32,7 +28,7 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
 
     @Override
     public String getName() {
-        return "xqa-query-balancer";
+        return serviceId;
     }
 
     @Override
@@ -42,8 +38,7 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
     }
 
     @Override
-    public void run(XqaQueryBalancerConfiguration configuration, Environment environment) throws Exception {
-
+    public void run(final XqaQueryBalancerConfiguration configuration, final Environment environment) throws Exception {
         environment.healthChecks().register("QueryBalancerHealthCheck", new QueryBalancerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();

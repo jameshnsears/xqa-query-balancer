@@ -36,11 +36,11 @@ public class SearchTest extends DatabaseFixture {
     private final Client client = ClientBuilder.newClient();
 
     @BeforeAll
-    public static void startContainers(final ConfigurationAccessor configurationAccessor) throws Exception {
+    public static void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
         dockerClient = new DockerClient();
 
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
+        final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        final Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
         dockerClient.pull(configurationAccessor.images());
@@ -49,24 +49,28 @@ public class SearchTest extends DatabaseFixture {
     }
 
     @AfterAll
-    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) throws Exception {
+    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) throws IOException {
         dockerClient.rmContainers(configurationAccessor);
         APPLICATION.after();
     }
 
     @Test
-    public void search() throws Exception {
+    public void search() throws SQLException, ClassNotFoundException, IOException {
         storageEmpty();
         storagePopulate();
 
+        final String searchUrl = "http://127.0.0.1:" + APPLICATION.getLocalPort() + "/search";
+
         final SearchResponse searchWithoutTrailingSlash = client
-                .target("http://127.0.0.1:" + APPLICATION.getLocalPort() + "/search").request()
+                .target(searchUrl)
+                .request()
                 .get(SearchResponse.class);
 
         Assertions.assertEquals(240, searchWithoutTrailingSlash.getSearchResponse().size());
 
         final SearchResponse searchWithTrailingSlash = client
-                .target("http://127.0.0.1:" + APPLICATION.getLocalPort() + "/search/").request()
+                .target(searchUrl)
+                .request()
                 .get(SearchResponse.class);
 
         Assertions.assertEquals(OBJECTMAPPER.writeValueAsString(searchWithoutTrailingSlash.getSearchResponse()),
@@ -102,8 +106,8 @@ public class SearchTest extends DatabaseFixture {
 
         assertThat(OBJECTMAPPER.writeValueAsString(searchResponse.getSearchResponse())).isEqualTo(expected);
 
-        WebTarget target = client.target("http://127.0.0.1:" + APPLICATION.getLocalPort() + "/search/filename/blah");
-        Response response = target.request().get();
+        final WebTarget target = client.target("http://127.0.0.1:" + APPLICATION.getLocalPort() + "/search/filename/blah");
+        final Response response = target.request().get();
 
         Assertions.assertEquals(204, response.getStatus());
     }

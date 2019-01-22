@@ -23,6 +23,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
 import xqa.commons.qpid.jms.MessageBroker;
@@ -35,6 +37,7 @@ import xqa.resources.messagebroker.QueryBalancerEvent;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class XQueryResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XQueryResource.class);
     private final String serviceId;
     private TemporaryQueue shardReplyToQueue;
     private MessageBroker messageBroker;
@@ -48,26 +51,23 @@ public class XQueryResource {
         synchronized (this) {
             this.serviceId = serviceId;
 
-            initMessageBroker(messageBrokerConfiguration);
+            messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
+                    messageBrokerConfiguration.getUserName(), messageBrokerConfiguration.getPassword(),
+                    messageBrokerConfiguration.getRetryAttempts());
+
+            auditDestination = messageBrokerConfiguration.getAuditDestination();
+            xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
 
             shardResponseTimeout = messageBrokerConfiguration.getShardResponseTimeout();
+            LOGGER.info(String.format("shardResponseTimeout=%d", shardResponseTimeout));
             shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
+            LOGGER.info(String.format("shardResponseSecondaryTimeout=%d", shardResponseSecondaryTimeout));
         }
-    }
-
-    public void initMessageBroker(final MessageBrokerConfiguration messageBrokerConfiguration)
-            throws InterruptedException, MessageBroker.MessageBrokerException {
-        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
-                messageBrokerConfiguration.getUserName(), messageBrokerConfiguration.getPassword(),
-                messageBrokerConfiguration.getRetryAttempts());
-
-        auditDestination = messageBrokerConfiguration.getAuditDestination();
-        xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
     }
 
     @POST
     @Timed
-    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) 
+    public XQueryResponse xquery(final @NotNull @Valid XQueryRequest xquery)
             throws JMSException, JsonProcessingException, MessageBrokerException { // json in
         if (xquery.getXQueryRequest().isEmpty()) {
             throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
@@ -75,7 +75,7 @@ public class XQueryResource {
 
         List<Message> shardXQueryResponses = new Vector<>();
 
-        String correlationId = UUID.randomUUID().toString();
+        final String correlationId = UUID.randomUUID().toString();
 
         sendAuditEvent(QueryBalancerEvent.State.START, correlationId, xquery.toString());
 
@@ -88,25 +88,28 @@ public class XQueryResource {
         return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }
 
-    public synchronized void sendAuditEvent(QueryBalancerEvent.State eventState, String correlationId, String xquery)
+    public synchronized void sendAuditEvent(final QueryBalancerEvent.State eventState,
+                                            final String correlationId,
+                                            final String xquery)
             throws JMSException, JsonProcessingException, MessageBroker.MessageBrokerException {
-        QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
+        final QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
                 DigestUtils.sha256Hex(xquery), eventState);
 
-        ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
 
-        Message message = MessageMaker.createMessage(messageBroker.getSession(),
+        final Message message = MessageMaker.createMessage(messageBroker.getSession(),
                 messageBroker.getSession().createQueue(auditDestination), UUID.randomUUID().toString(),
                 mapper.writeValueAsString(queryBalancerEvent));
 
         messageBroker.sendMessage(message);
     }
 
-    public synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery, String correlationId)
+    public synchronized void sendXQueryToShards(final @NotNull @Valid XQueryRequest xquery,
+                                                final String correlationId)
             throws JMSException, MessageBroker.MessageBrokerException {
         shardReplyToQueue = messageBroker.createTemporaryQueue();
 
-        Message message = MessageMaker.createMessage(messageBroker.getSession(),
+        final Message message = MessageMaker.createMessage(messageBroker.getSession(),
                 messageBroker.getSession().createTopic(xqueryDestination), shardReplyToQueue, correlationId,
                 xquery.getXQueryRequest());
 
@@ -118,10 +121,10 @@ public class XQueryResource {
                 shardResponseSecondaryTimeout);
     }
 
-    private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses) throws JMSException {
-        StringBuilder response = new StringBuilder("<xqueryResponse>\n");
-        for (Message message : shardXQueryResponses) {
-            response.append(MessageMaker.getBody(message)).append("\n");
+    private String materialiseShardXQueryResponses(final List<Message> shardXQueryResponses) throws JMSException {
+        final StringBuilder response = new StringBuilder("<xqueryResponse>\n");
+        for (final Message message : shardXQueryResponses) {
+            response.append(MessageMaker.getBody(message));
         }
         return response.append("</xqueryResponse>").toString();
     }

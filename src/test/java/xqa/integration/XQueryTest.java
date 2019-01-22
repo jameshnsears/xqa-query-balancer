@@ -9,6 +9,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +31,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
+import org.xml.sax.SAXException;
 import xqa.XqaQueryBalancerApplication;
 import xqa.XqaQueryBalancerConfiguration;
 import xqa.api.xquery.XQueryRequest;
@@ -41,7 +43,6 @@ public class XQueryTest extends ShardFixture {
     private static final DropwizardTestSupport<XqaQueryBalancerConfiguration> APPLICATION = new DropwizardTestSupport<>(
             XqaQueryBalancerApplication.class, ResourceHelpers.resourceFilePath("xqa-query-balancer.yml"));
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchTest.class);
     private static DockerClient dockerClient;
     private Client client = ClientBuilder.newClient();
     
@@ -53,8 +54,8 @@ public class XQueryTest extends ShardFixture {
     public static void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException, InterruptedException {
         dockerClient = new DockerClient();
 
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
+        final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        final Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
         dockerClient.pull(configurationAccessor.images());
@@ -66,7 +67,7 @@ public class XQueryTest extends ShardFixture {
     }
 
     @AfterAll
-    public static void stopContainers(final ConfigurationAccessor configurationAccessor) throws Exception {
+    public static void stopContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
         dockerClient.rmContainers(configurationAccessor);
         APPLICATION.after();
     }
@@ -78,32 +79,21 @@ public class XQueryTest extends ShardFixture {
                 .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("count(/)")))
                 .readEntity(XQueryResponse.class);
 
-        /*
-        <xqueryResponse>
-            <shard id='abb4c954'>
-                2
-            </shard>
-            <shard id='1211040c'>
-                2
-            </shard>
-        </xqueryResponse>
-         */
-
         LOGGER.info(xqueryResponse.getXqueryResponse());
 
-        Document xmlDocument = documentBuilder
+        final Document xmlDocument = documentBuilder
                 .parse(new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
-        NodeList nodeList = (NodeList) xPath.compile("/xqueryResponse/shard").evaluate(xmlDocument,
+        final NodeList nodeList = (NodeList) xPath.compile("/xqueryResponse/shard").evaluate(xmlDocument,
                 XPathConstants.NODESET);
         Assertions.assertEquals(2, nodeList.getLength());
 
         assertShardsCumulativeSize(nodeList);
     }
 
-    private void assertShardsCumulativeSize(NodeList nodeList) {
+    private void assertShardsCumulativeSize(final NodeList nodeList) {
         int cumulativeSize = 0;
         for (int i = 0; i < nodeList.getLength(); i++) {
-            Node node = nodeList.item(i);
+            final Node node = nodeList.item(i);
             Assertions.assertEquals(false, node.getAttributes().getNamedItem("id").getNodeValue().isEmpty());
 
             cumulativeSize += Integer.parseInt(node.getFirstChild().getTextContent().replaceAll("\\s", ""));
@@ -113,27 +103,16 @@ public class XQueryTest extends ShardFixture {
     }
 
     @Test
-    public void xqueryContent() throws Exception {
+    public void xqueryContent() throws IOException, SAXException, XPathExpressionException {
         final XQueryResponse xqueryResponse = client.target("http://0.0.0.0:" + APPLICATION.getLocalPort() + "/xquery")
                 .request(MediaType.APPLICATION_JSON_TYPE)
                 .post(Entity.json(new XQueryRequest("/chapter/metadataInfo/PSMID"))).readEntity(XQueryResponse.class);
 
-        /*
-        <xqueryResponse>
-            <shard id='1211040c'>
-                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1943_0958_000_0000</PSMID>
-            </shard>
-            <shard id='abb4c954'>
-                <PSMID xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">cho_meet_1949_1705_000_0000</PSMID>
-            </shard>
-        </xqueryResponse>
-         */
-
         LOGGER.info(xqueryResponse.getXqueryResponse());
 
-        Document xmlDocument = documentBuilder
+        final Document xmlDocument = documentBuilder
                 .parse(new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));
-        NodeList nodeList = (NodeList) xPath.compile("/xqueryResponse/shard/PSMID").evaluate(xmlDocument,
+        final NodeList nodeList = (NodeList) xPath.compile("/xqueryResponse/shard/PSMID").evaluate(xmlDocument,
                 XPathConstants.NODESET);
         Assertions.assertEquals(2, nodeList.getLength());
     }

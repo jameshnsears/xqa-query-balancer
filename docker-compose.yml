@@ -21,6 +21,16 @@ services:
     networks:
       - xqa
 
+  xqa-db-amqp:
+    image: jameshnsears/xqa-db-amqp
+    container_name: xqa-db-amqp
+    command: ['-message_broker_host', 'xqa-message-broker', '-storage_host', 'xqa-db', '-storage_port', '5432']
+    networks:
+      - xqa
+    depends_on:
+      - xqa-db
+      - xqa-message-broker
+
   xqa-message-broker:
     image: jameshnsears/xqa-message-broker:latest
     container_name: xqa-message-broker
@@ -50,6 +60,15 @@ services:
       - xqa
     depends_on:
       - xqa-message-broker
+
+  xqa-ingest:
+    image: jameshnsears/xqa-ingest
+    container_name: xqa-ingest
+    command: ["-message_broker_host", "xqa-message-broker"]
+    depends_on:
+      - xqa-message-broker
+    networks:
+      - xqa
 
 volumes:
   xqa-db:

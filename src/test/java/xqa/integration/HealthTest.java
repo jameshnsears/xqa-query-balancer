@@ -37,8 +37,8 @@ public class HealthTest extends Containerisation {
     public void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
         dockerClient = new DockerClient();
 
-        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
+        final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        final Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
         dockerClient.pull(configurationAccessor.images());
@@ -54,7 +54,7 @@ public class HealthTest extends Containerisation {
 
     @Test
     public void queryBalancerHealth() throws IOException {
-        Client client = ClientBuilder.newClient();
+        final Client client = ClientBuilder.newClient();
 
         final Response healthCheck = client.target("http://0.0.0.0:" + APPLICATION.getAdminPort() + "/healthcheck")
                 .request("text/plain").get();
