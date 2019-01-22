@@ -1,38 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE document SYSTEM "calendar_V1-8.dtd">
 <document>
-<cid>SP-MAIN-122-m0005-cm.xml</cid>
-<msl>The Royal Archives</msl>
-<cseg>Stuart Papers</cseg>
-<mcode></mcode>
-<id></id>
-<monarch>George II</monarch>
-<vtitle>Stuart Papers: Main Series, 1579-1823: 16 Nov - 31 Dec, 1728</vtitle>
-<vnum>122</vnum>
-<pnum></pnum>
-<ctrns></ctrns>
-<folio></folio>
-<fdate>17281116</fdate>
-<tdate>17281231</tdate>
-<cpl></cpl>
-<cauth>Hay, John</cauth>
-<crep></crep>
-<chunktype>cm</chunktype>
-<cdoc></cdoc>
-<spn></spn>
-<clpg></clpg>
-<chap>Vol. 122</chap>
-<chapm></chapm>
-<cpg id="cmpg0005" first="no">1</cpg>
-<pg id="cmpg0005" seq="0002" first="no">1</pg>
-<cnum>5</cnum>
-<ctit>Hay, John</ctit>
-<cd>16 Nov - 31 Dec</cd>
-<cyr>1728</cyr>
-<clng></clng>
-<cps></cps>
-<ctxt>
-<p></p>
-</ctxt>
-<allid></allid>
+    <cid>SP-MAIN-122-m0005-cm.xml</cid>
+    <msl>The Royal Archives</msl>
+    <cseg>Stuart Papers</cseg>
+    <mcode></mcode>
+    <id></id>
+    <monarch>George II</monarch>
+    <vtitle>Stuart Papers: Main Series, 1579-1823: 16 Nov - 31 Dec, 1728</vtitle>
+    <vnum>122</vnum>
+    <pnum></pnum>
+    <ctrns></ctrns>
+    <folio></folio>
+    <fdate>17281116</fdate>
+    <tdate>17281231</tdate>
+    <cpl></cpl>
+    <cauth>Hay, John</cauth>
+    <crep></crep>
+    <chunktype>cm</chunktype>
+    <cdoc></cdoc>
+    <spn></spn>
+    <clpg></clpg>
+    <chap>Vol. 122</chap>
+    <chapm></chapm>
+    <cpg id="cmpg0005" first="no">1</cpg>
+    <pg id="cmpg0005" seq="0002" first="no">1</pg>
+    <cnum>5</cnum>
+    <ctit>Hay, John</ctit>
+    <cd>16 Nov - 31 Dec</cd>
+    <cyr>1728</cyr>
+    <clng></clng>
+    <cps></cps>
+    <ctxt>
+        <p></p>
+    </ctxt>
+    <allid></allid>
 </document>

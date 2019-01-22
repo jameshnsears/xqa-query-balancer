@@ -1,9 +1,4 @@
-use mockito for faster running unit tests - i.e. without using containers
-
 update readme.cli so that test data loaded into xqa-db and shards and cli / wget / curl shows data coming out
-
-define API & test it
-= load two xqa shard with same data created by database
 
 /search == returns everything
 /search/filename/{filename} i.e. DBER-1923-0416.xml
@@ -16,11 +11,3 @@ define API & test it
 /tasks/gc
 /healthcheck
 /metrics
-
-
-4. materialised, across n shards, xquery
-
---
-
-XQueryReurce need bulletproffing - what happens if messagebroker disappers?
-= we need to reconnect

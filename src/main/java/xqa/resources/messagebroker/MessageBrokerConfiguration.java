@@ -1,7 +1,8 @@
 package xqa.resources.messagebroker;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MessageBrokerConfiguration {
     @NotEmpty

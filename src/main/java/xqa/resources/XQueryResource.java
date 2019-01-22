@@ -1,17 +1,8 @@
 package xqa.resources;
 
-import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xqa.api.xquery.XQueryRequest;
-import xqa.api.xquery.XQueryResponse;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageMaker;
-import xqa.resources.messagebroker.MessageBrokerConfiguration;
-import xqa.resources.messagebroker.QueryBalancerEvent;
+import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -25,14 +16,27 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.UUID;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import xqa.api.xquery.XQueryRequest;
+import xqa.api.xquery.XQueryResponse;
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageMaker;
+import xqa.resources.messagebroker.MessageBrokerConfiguration;
+import xqa.resources.messagebroker.QueryBalancerEvent;
 
 @Path("/xquery")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class XQueryResource {
-    private static final Logger logger = LoggerFactory.getLogger(XQueryResource.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(XQueryResource.class);
     private final String serviceId;
     private TemporaryQueue shardReplyToQueue;
     private MessageBroker messageBroker;
@@ -41,8 +45,7 @@ public class XQueryResource {
     private int shardResponseTimeout;
     private int shardResponseSecondaryTimeout;
 
-    public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration,
-                          final String serviceId)
+    public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration, final String serviceId)
             throws InterruptedException, MessageBroker.MessageBrokerException {
         synchronized (this) {
             this.serviceId = serviceId;
@@ -56,9 +59,9 @@ public class XQueryResource {
 
     public void initMessageBroker(final MessageBrokerConfiguration messageBrokerConfiguration)
             throws InterruptedException, MessageBroker.MessageBrokerException {
-        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
-                messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
-                messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
+        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
+                messageBrokerConfiguration.getUserName(), messageBrokerConfiguration.getPassword(),
+                messageBrokerConfiguration.getRetryAttempts());
 
         auditDestination = messageBrokerConfiguration.getAuditDestination();
         xqueryDestination = messageBrokerConfiguration.getXqueryDestination();
@@ -66,13 +69,13 @@ public class XQueryResource {
 
     @POST
     @Timed
-    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) throws JMSException { // json in
+    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) throws JMSException { // json
+                                                                                             // in
         if (xquery.getXQueryRequest().isEmpty()) {
             throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
         }
 
-        logger.info(xquery.toString());
-        List<Message> shardXQueryResponses = null;
+        List<Message> shardXQueryResponses = new Vector<>();
 
         try {
             String correlationId = UUID.randomUUID().toString();
@@ -85,14 +88,13 @@ public class XQueryResource {
 
             sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
         } catch (Exception exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
 
         return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }
 
-    public synchronized void sendAuditEvent(QueryBalancerEvent.State eventState,
-                                             String correlationId, String xquery)
+    public synchronized void sendAuditEvent(QueryBalancerEvent.State eventState, String correlationId, String xquery)
             throws JMSException, JsonProcessingException, MessageBroker.MessageBrokerException {
         QueryBalancerEvent queryBalancerEvent = new QueryBalancerEvent(serviceId, correlationId,
                 DigestUtils.sha256Hex(xquery), eventState);
@@ -106,8 +108,7 @@ public class XQueryResource {
         messageBroker.sendMessage(message);
     }
 
-    public synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery,
-                                                 String correlationId)
+    public synchronized void sendXQueryToShards(@NotNull @Valid XQueryRequest xquery, String correlationId)
             throws JMSException, MessageBroker.MessageBrokerException {
         shardReplyToQueue = messageBroker.createTemporaryQueue();
 
@@ -123,8 +124,7 @@ public class XQueryResource {
                 shardResponseSecondaryTimeout);
     }
 
-    private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses)
-            throws JMSException {
+    private String materialiseShardXQueryResponses(List<Message> shardXQueryResponses) throws JMSException {
         StringBuilder response = new StringBuilder("<xqueryResponse>\n");
         for (Message message : shardXQueryResponses) {
             response.append(MessageMaker.getBody(message)).append("\n");

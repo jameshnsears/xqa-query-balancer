@@ -1,19 +1,5 @@
 package xqa.integration.fixtures;
 
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import xqa.XqaQueryBalancerConfiguration;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageMaker;
-import xqa.resources.messagebroker.MessageBrokerConfiguration;
-
-import javax.jms.Message;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -22,8 +8,24 @@ import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import javax.jms.Message;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
+
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import xqa.XqaQueryBalancerConfiguration;
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageMaker;
+import xqa.resources.messagebroker.MessageBrokerConfiguration;
+
 public class ShardFixture extends Containerisation {
-    private static final Logger logger = LoggerFactory.getLogger(ShardFixture.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShardFixture.class);
     private DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
     protected DocumentBuilder documentBuilder;
     protected XPath xPath = XPathFactory.newInstance().newXPath();
@@ -34,7 +36,7 @@ public class ShardFixture extends Containerisation {
         try {
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
         } catch (ParserConfigurationException exception) {
-            logger.error(exception.getMessage());
+            LOGGER.error(exception.getMessage());
         }
     }
 
@@ -45,9 +47,9 @@ public class ShardFixture extends Containerisation {
     protected void setupStorage(XqaQueryBalancerConfiguration configuration) throws Exception {
         messageBrokerConfiguration = configuration.getMessageBrokerConfiguration();
 
-        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(),
-                messageBrokerConfiguration.getPort(), messageBrokerConfiguration.getUserName(),
-                messageBrokerConfiguration.getPassword(), messageBrokerConfiguration.getRetryAttempts());
+        messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
+                messageBrokerConfiguration.getUserName(), messageBrokerConfiguration.getPassword(),
+                messageBrokerConfiguration.getRetryAttempts());
 
         populateShards();
         waitForDataToGetInsertedIntoShards();
@@ -56,7 +58,7 @@ public class ShardFixture extends Containerisation {
     }
 
     private void waitForDataToGetInsertedIntoShards() throws InterruptedException {
-        Thread.sleep(10000);
+        Thread.sleep(15000);
     }
 
     private void populateShards() throws IOException {
@@ -66,7 +68,7 @@ public class ShardFixture extends Containerisation {
                     try {
                         insertFileContentsIntoShard(filePath);
                     } catch (Exception exception) {
-                        logger.error(exception.getMessage());
+                        LOGGER.error(exception.getMessage());
                     }
                 }
             });
@@ -74,7 +76,7 @@ public class ShardFixture extends Containerisation {
     }
 
     private void insertFileContentsIntoShard(Path filePath) throws Exception {
-        logger.debug(filePath.toString());
+        LOGGER.debug(filePath.toString());
         Message message = MessageMaker.createMessage(messageBroker.getSession(),
                 messageBroker.getSession().createQueue(messageBrokerConfiguration.getIngestDestination()),
                 UUID.randomUUID().toString(), filePath.toString(),

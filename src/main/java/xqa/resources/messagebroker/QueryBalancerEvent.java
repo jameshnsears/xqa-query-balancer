@@ -1,8 +1,8 @@
 package xqa.resources.messagebroker;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class QueryBalancerEvent {
     private String serviceId = "";
@@ -16,7 +16,7 @@ public class QueryBalancerEvent {
     }
 
     public QueryBalancerEvent(final String serviceId, final String correlationId, final String digest,
-                              final QueryBalancerEvent.State state) {
+            final QueryBalancerEvent.State state) {
         this.serviceId = serviceId;
         this.creationTime = new Date().getTime();
         this.correlationId = correlationId;

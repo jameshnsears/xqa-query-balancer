@@ -22,12 +22,6 @@ logging:
     xqa: DEBUG
   appenders:
     - type: console
-#    - type: file
-#      currentLogFilename: ./logs/application.log
-#      archivedLogFilenamePattern: ./logs/application-%d-%i.log.gz
-#      archive: true
-#      archivedFileCount: 7
-#      maxFileSize: 1mb
 
 messageBroker:
   host: xqa-message-broker
@@ -38,5 +32,5 @@ messageBroker:
   xqueryDestination: xqa.shard.xquery
   ingestDestination: xqa.ingest
   auditDestination: xqa.event
-  shardResponseTimeout: 60000
+  shardResponseTimeout: 2000
   shardResponseSecondaryTimeout: 5000

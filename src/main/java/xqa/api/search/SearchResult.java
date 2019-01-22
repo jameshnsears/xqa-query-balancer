@@ -44,7 +44,7 @@ public class SearchResult {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this).add("creationTime", creationTime)
-                .add("serviceId", serviceId).add("search", subject).add("digest", digest).toString();
+        return MoreObjects.toStringHelper(this).add("creationTime", creationTime).add("serviceId", serviceId)
+                .add("search", subject).add("digest", digest).toString();
     }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.jameshnsears</groupId>
     <artifactId>xqa-query-balancer</artifactId>
@@ -101,12 +101,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.12.0</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
@@ -184,15 +178,8 @@
                         <ruleset>/category/java/performance.xml</ruleset>
                     </rulesets>
                 </configuration>
-                <!--
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                -->
+                <!-- <executions> <execution> <goals> <goal>check</goal> 
+                    </goals> </execution> </executions> -->
             </plugin>
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
@@ -308,9 +295,9 @@
                     </filters>
                     <transformers>
                         <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                         <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <mainClass>xqa.XqaQueryBalancerApplication</mainClass>
                         </transformer>
                     </transformers>

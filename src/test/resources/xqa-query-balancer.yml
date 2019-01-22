@@ -2,6 +2,9 @@ server:
   applicationConnectors:
     - type: http
       port: 9090
+  adminConnectors:
+    - type: http
+      port: 9091
 
 database:
   driverClass: org.postgresql.Driver
@@ -37,5 +40,5 @@ messageBroker:
   xqueryDestination: xqa.shard.xquery
   ingestDestination: xqa.ingest
   auditDestination: xqa.event
-  shardResponseTimeout: 1000
+  shardResponseTimeout: 2000
   shardResponseSecondaryTimeout: 5000
