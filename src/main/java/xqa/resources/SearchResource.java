@@ -31,10 +31,10 @@ public class SearchResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResource.class);
     private final Jdbi jdbi;
 
-    private final String SQL_SELECT = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+    private final String SQLSELECT = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
             + "info->>'source' as filename, " + "info->>'digest' as digest, " + "info->>'serviceId' as service ";
-    private final String SQL_FROM = "from events ";
-    private final String SQL_ORDERBY = "order by creationTime asc;";
+    private final String SQLFROM = "from events ";
+    private final String SQLORDERBY = "order by creationTime asc;";
 
     public SearchResource(Jdbi jdbi) {
         synchronized (this) {
@@ -46,7 +46,7 @@ public class SearchResource {
     @Timed
     @Path("/")
     public synchronized SearchResponse search() {
-        String sql = SQL_SELECT + SQL_FROM + SQL_ORDERBY;
+        String sql = SQLSELECT + SQLFROM + SQLORDERBY;
 
         List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -90,8 +90,8 @@ public class SearchResource {
 
         LOGGER.debug("filename={}", filename.get());
 
-        String sql = SQL_SELECT + SQL_FROM + "where info->>'source' like '%" + filename.get()
-                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQL_ORDERBY;
+        String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename.get()
+                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQLORDERBY;
 
         List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -115,8 +115,8 @@ public class SearchResource {
 
         LOGGER.debug("digest={}", digest.get());
 
-        String sql = SQL_SELECT + SQL_FROM + "where info->>'digest' like '%" + digest.get()
-                + "%' and info->>'state' = 'START' " + SQL_ORDERBY;
+        String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest.get()
+                + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -140,8 +140,8 @@ public class SearchResource {
 
         LOGGER.debug("serviceId={}", serviceId.get());
 
-        String sql = SQL_SELECT + SQL_FROM + "where info->>'serviceId' like '%" + serviceId.get()
-                + "%' and info->>'state' = 'START' " + SQL_ORDERBY;
+        String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId.get()
+                + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         List<SearchResult> searchResults = getSearchResults(sql);
 
