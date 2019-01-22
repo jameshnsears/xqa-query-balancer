@@ -30,10 +30,10 @@ import xqa.api.search.SearchServiceReponse;
 public class SearchResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResource.class);
     private final Jdbi jdbi;
-    private final String sqlselect = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+    private final static String sqlselect = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
             + "info->>'source' as filename, " + "info->>'digest' as digest, " + "info->>'serviceId' as service ";
-    private final String sqlfrom = "from events ";
-    private final String sqlorderby = "order by creationTime asc;";
+    private final static String sqlfrom = "from events ";
+    private final static String sqlorderby = "order by creationTime asc;";
 
     public SearchResource(final Jdbi jdbi) {
         synchronized (this) {

@@ -1,0 +1,44 @@
+server:
+  applicationConnectors:
+    - type: http
+      port: 9090
+  adminConnectors:
+    - type: http
+      port: 9091
+
+database:
+  driverClass: org.postgresql.Driver
+  user: xqa
+  password: xqa
+  url: jdbc:postgresql://0.0.0.0:5432/xqa
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 5s
+  validationQuery: SELECT 1;
+  initialSize: 1
+  minSize: 1
+  maxSize: 4
+  checkConnectionWhileIdle: false
+  evictionInterval: 10s
+  minIdleTime: 1 minute
+
+logging:
+  level: INFO
+  loggers:
+    org.apache.qpid.jms: WARN
+    org.apache.tomcat.jdbc: WARN
+    xqa: DEBUG
+  appenders:
+    - type: console
+
+messageBroker:
+  host: 0.0.0.0
+  port: 5672
+  userName: admin
+  password: admin
+  retryAttempts: 5
+  xqueryDestination: xqa.shard.xquery
+  ingestDestination: xqa.ingest
+  auditDestination: xqa.event
+  shardResponseTimeout: 2000
+  shardResponseSecondaryTimeout: 5000
