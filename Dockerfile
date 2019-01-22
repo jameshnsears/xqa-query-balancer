@@ -19,4 +19,4 @@ WORKDIR ${OPTDIR}${XQA}
 
 ENTRYPOINT ["java", "-jar", "xqa-query-balancer-1.0.0-SNAPSHOT.jar", "server", "xqa-query-balancer.yml"]
 
-EXPOSE 8080 8081
+EXPOSE 9090 9091
