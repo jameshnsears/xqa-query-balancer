@@ -30,10 +30,10 @@ import xqa.api.search.SearchServiceReponse;
 public class SearchResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchResource.class);
     private final Jdbi jdbi;
-    private final static String sqlselect = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
+    private static final String SQLSELECT = "select to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime, "
             + "info->>'source' as filename, " + "info->>'digest' as digest, " + "info->>'serviceId' as service ";
-    private final static String sqlfrom = "from events ";
-    private final static String sqlorderby = "order by creationTime asc;";
+    private static final String SQLFROM = "from events ";
+    private static final String SQLORDERBY = "order by creationTime asc;";
 
     public SearchResource(final Jdbi jdbi) {
         synchronized (this) {
@@ -44,7 +44,7 @@ public class SearchResource {
     @GET
     @Timed
     public SearchResponse search() {
-        final String sql = sqlselect + sqlfrom + sqlorderby;
+        final String sql = SQLSELECT + SQLFROM + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -84,8 +84,8 @@ public class SearchResource {
     public SearchFilenameResponse filename(final @PathParam("filename") Optional<String> filename) {
         LOGGER.debug("filename={}", filename.get());
 
-        final String sql = sqlselect + sqlfrom + "where info->>'source' like '%" + filename.get()
-                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + sqlorderby;
+        final String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename.get()
+                + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -104,8 +104,8 @@ public class SearchResource {
     public SearchDigestReponse digest(final @PathParam("digest") Optional<String> digest) {
         LOGGER.debug("digest={}", digest.get());
 
-        final String sql = sqlselect + sqlfrom + "where info->>'digest' like '%" + digest.get()
-                + "%' and info->>'state' = 'START' " + sqlorderby;
+        final String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest.get()
+                + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
 
@@ -124,8 +124,8 @@ public class SearchResource {
     public SearchServiceReponse service(final @PathParam("serviceId") Optional<String> serviceId) {
         LOGGER.debug("serviceId={}", serviceId.get());
 
-        final String sql = sqlselect + sqlfrom + "where info->>'serviceId' like '%" + serviceId.get()
-                + "%' and info->>'state' = 'START' " + sqlorderby;
+        final String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId.get()
+                + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
         final List<SearchResult> searchResults = getSearchResults(sql);
 
