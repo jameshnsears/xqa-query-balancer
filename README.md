@@ -14,7 +14,7 @@ Featuring:
 * See .travis.yml
 
 ### 2.2. CLI 
-Populate xqa-shard(s) and xqa-db; assuming xqa-test available.
+* populate xqa-shard(s) and xqa-db using xqa-test-data:
 ```
 docker-compose up -d xqa-message-broker xqa-db xqa-db-amqp xqa-ingest-balancer
 docker-compose scale xqa-shard=2
@@ -49,7 +49,9 @@ docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:
 
 ### 2.2.2. XQuery
 ```
-{"xqueryResponse":"<xqueryResponse>\n<shard id='26507201'>\n20\n</shard><shard id='dd929cc5'>\n20\n</shard></xqueryResponse>"}
+{
+"xqueryResponse":"<xqueryResponse>\n<shard id='26507201'>\n20\n</shard><shard id='dd929cc5'>\n20\n</shard></xqueryResponse>"
+}
 ```
 * curl http://127.0.0.1:9090/xquery -X POST -H "Content-Type: application/json" -d '{"xqueryRequest":"count(/)"}'
 
@@ -62,7 +64,7 @@ docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:
 ## 3. Teardown
 * docker-compose down -v
 
-## 4. Storage
+## 4. Useful storage commands
 ## 4.1. BaseX
 * basexclient -U admin -P admin
 * open xqa

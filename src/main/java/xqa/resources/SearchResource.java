@@ -82,8 +82,6 @@ public class SearchResource {
     @Timed
     @Path("/filename/{filename : .+}")
     public SearchFilenameResponse filename(final @PathParam("filename") Optional<String> filename) {
-        LOGGER.debug("filename={}", filename.get());
-
         final String sql = SQLSELECT + SQLFROM + "where info->>'source' like '%" + filename.get()
                 + "%' and info->>'serviceId' like 'ingest/%' and info->>'state' = 'START' " + SQLORDERBY;
 
@@ -102,8 +100,6 @@ public class SearchResource {
     @Timed
     @Path("/digest/{digest : .+}")
     public SearchDigestReponse digest(final @PathParam("digest") Optional<String> digest) {
-        LOGGER.debug("digest={}", digest.get());
-
         final String sql = SQLSELECT + SQLFROM + "where info->>'digest' like '%" + digest.get()
                 + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
@@ -122,8 +118,6 @@ public class SearchResource {
     @Timed
     @Path("/service/{serviceId : .+}")
     public SearchServiceReponse service(final @PathParam("serviceId") Optional<String> serviceId) {
-        LOGGER.debug("serviceId={}", serviceId.get());
-
         final String sql = SQLSELECT + SQLFROM + "where info->>'serviceId' like '%" + serviceId.get()
                 + "%' and info->>'state' = 'START' " + SQLORDERBY;
 
