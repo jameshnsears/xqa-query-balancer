@@ -82,11 +82,6 @@ public class SearchResource {
     @Timed
     @Path("/filename/{filename : .+}")
     public SearchFilenameResponse filename(final @PathParam("filename") Optional<String> filename) {
-        if (!filename.isPresent()) {
-            LOGGER.warn("filename missing");
-            throw new WebApplicationException("filename missing", Response.Status.BAD_REQUEST);
-        }
-
         LOGGER.debug("filename={}", filename.get());
 
         final String sql = sqlselect + sqlfrom + "where info->>'source' like '%" + filename.get()
@@ -107,11 +102,6 @@ public class SearchResource {
     @Timed
     @Path("/digest/{digest : .+}")
     public SearchDigestReponse digest(final @PathParam("digest") Optional<String> digest) {
-        if (!digest.isPresent()) {
-            LOGGER.warn("digest missing");
-            throw new WebApplicationException("digest missing", Response.Status.BAD_REQUEST);
-        }
-
         LOGGER.debug("digest={}", digest.get());
 
         final String sql = sqlselect + sqlfrom + "where info->>'digest' like '%" + digest.get()
@@ -132,11 +122,6 @@ public class SearchResource {
     @Timed
     @Path("/service/{serviceId : .+}")
     public SearchServiceReponse service(final @PathParam("serviceId") Optional<String> serviceId) {
-        if (!serviceId.isPresent()) {
-            LOGGER.warn("serviceId missing");
-            throw new WebApplicationException("serviceId missing", Response.Status.BAD_REQUEST);
-        }
-
         LOGGER.debug("serviceId={}", serviceId.get());
 
         final String sql = sqlselect + sqlfrom + "where info->>'serviceId' like '%" + serviceId.get()
