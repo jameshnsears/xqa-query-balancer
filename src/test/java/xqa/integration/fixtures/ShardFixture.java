@@ -32,12 +32,8 @@ public class ShardFixture extends Containerisation {
     private MessageBrokerConfiguration messageBrokerConfiguration;
     private MessageBroker messageBroker;
 
-    public ShardFixture() {
-        try {
-            documentBuilder = documentBuilderFactory.newDocumentBuilder();
-        } catch (ParserConfigurationException exception) {
-            LOGGER.error(exception.getMessage());
-        }
+    public ShardFixture() throws ParserConfigurationException {
+        documentBuilder = documentBuilderFactory.newDocumentBuilder();
     }
 
     private String getResource() {

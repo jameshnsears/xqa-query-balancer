@@ -1,7 +1,6 @@
 package xqa.api.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
 
 public class SearchResult {
     private String creationTime;
@@ -26,9 +25,6 @@ public class SearchResult {
 
     @JsonProperty
     public String getSubject() {
-        if (subject == null) {
-            return "";
-        }
         return subject;
     }
 
@@ -40,11 +36,5 @@ public class SearchResult {
     @JsonProperty
     public String getdigest() {
         return digest;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this).add("creationTime", creationTime).add("serviceId", serviceId)
-                .add("search", subject).add("digest", digest).toString();
     }
 }

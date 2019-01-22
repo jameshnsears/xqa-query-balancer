@@ -11,10 +11,6 @@ public class QueryBalancerEvent {
     private String digest = "";
     private State state;
 
-    public QueryBalancerEvent() {
-        // Jackson deserialization
-    }
-
     public QueryBalancerEvent(final String serviceId, final String correlationId, final String digest,
             final QueryBalancerEvent.State state) {
         this.serviceId = serviceId;

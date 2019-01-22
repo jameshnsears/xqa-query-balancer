@@ -69,12 +69,8 @@ public class DatabaseFixture extends Containerisation {
         }
     }
 
-    private void truncate(Connection connection) {
-        try {
-            executeSql(connection, "truncate events;");
-        } catch (SQLException exception) {
-            LOGGER.error(exception.getMessage());
-        }
+    private void truncate(Connection connection) throws SQLException{
+        executeSql(connection, "truncate events;");
     }
 
     private void executeSql(Connection connection, String sql) throws SQLException {

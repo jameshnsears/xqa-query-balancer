@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
 import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageBroker.MessageBrokerException;
 import xqa.commons.qpid.jms.MessageMaker;
 import xqa.resources.messagebroker.MessageBrokerConfiguration;
 import xqa.resources.messagebroker.QueryBalancerEvent;
@@ -69,27 +70,23 @@ public class XQueryResource {
 
     @POST
     @Timed
-    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) throws JMSException { // json
-                                                                                             // in
+    public XQueryResponse xquery(@NotNull @Valid XQueryRequest xquery) 
+            throws JMSException, JsonProcessingException, MessageBrokerException { // json in
         if (xquery.getXQueryRequest().isEmpty()) {
             throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
         }
 
         List<Message> shardXQueryResponses = new Vector<>();
 
-        try {
-            String correlationId = UUID.randomUUID().toString();
+        String correlationId = UUID.randomUUID().toString();
 
-            sendAuditEvent(QueryBalancerEvent.State.START, correlationId, xquery.toString());
+        sendAuditEvent(QueryBalancerEvent.State.START, correlationId, xquery.toString());
 
-            sendXQueryToShards(xquery, correlationId);
+        sendXQueryToShards(xquery, correlationId);
 
-            shardXQueryResponses = collectShardXQueryResponses();
+        shardXQueryResponses = collectShardXQueryResponses();
 
-            sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
-        } catch (Exception exception) {
-            LOGGER.error(exception.getMessage());
-        }
+        sendAuditEvent(QueryBalancerEvent.State.END, correlationId, xquery.toString());
 
         return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }

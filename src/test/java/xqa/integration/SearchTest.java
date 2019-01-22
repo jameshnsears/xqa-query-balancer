@@ -36,30 +36,22 @@ public class SearchTest extends DatabaseFixture {
     private final Client client = ClientBuilder.newClient();
 
     @BeforeAll
-    public static void startContainers(final ConfigurationAccessor configurationAccessor) {
+    public static void startContainers(final ConfigurationAccessor configurationAccessor) throws Exception {
         dockerClient = new DockerClient();
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         Logger rootLogger = loggerContext.getLogger("com.github.jameshnsears.docker.DockerClient");
         ((ch.qos.logback.classic.Logger) rootLogger).setLevel(Level.OFF);
 
-        try {
-            dockerClient.pull(configurationAccessor.images());
-            dockerClient.startContainers(configurationAccessor);
-            APPLICATION.before();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        dockerClient.pull(configurationAccessor.images());
+        dockerClient.startContainers(configurationAccessor);
+        APPLICATION.before();
     }
 
     @AfterAll
-    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) {
-        try {
-            dockerClient.rmContainers(configurationAccessor);
-            APPLICATION.after();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void stopcontainers(final ConfigurationAccessor configurationAccessor) throws Exception {
+        dockerClient.rmContainers(configurationAccessor);
+        APPLICATION.after();
     }
 
     @Test

@@ -1,11 +1,13 @@
 package xqa.integration;
 
+import java.io.IOException;
 import java.io.StringReader;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 
 import org.junit.jupiter.api.AfterAll;
@@ -42,9 +44,13 @@ public class XQueryTest extends ShardFixture {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchTest.class);
     private static DockerClient dockerClient;
     private Client client = ClientBuilder.newClient();
+    
+    public XQueryTest() throws ParserConfigurationException {
+        super();
+    }
 
     @BeforeAll
-    public static void startContainers(final ConfigurationAccessor configurationAccessor) throws Exception {
+    public static void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException, InterruptedException {
         dockerClient = new DockerClient();
 
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
