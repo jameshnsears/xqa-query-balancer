@@ -77,6 +77,7 @@ fc1566caa4e5        jameshnsears/xqa-shard:latest             "python3 xqa/shard
 basexclient -U admin -P admin -p 32778
 list # nothing will show when using: -storage_mainmem
 open xqa
+
 ```
 
 ## 4.2. psql
