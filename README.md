@@ -35,10 +35,10 @@ docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:
 "searchResponse":
     [
         {
-            "creationTime":"2019-01-22 12:03:22.919+00",
-            "serviceId":"/xml/DBER-1923-0416.xml",
-            "subject":"aa84010cfefca52e93b61d528a4e869b0cc7b051fd627a072c0b38857d97d8b5",
-            "digest":"ingest/8d9d6ed5"
+            "creationtime":"2019-01-22 12:03:22.919+00",
+            "subject":"/xml/DBER-1923-0416.xml",
+            "digest":"aa84010cfefca52e93b61d528a4e869b0cc7b051fd627a072c0b38857d97d8b5",
+            "serviceid":"ingest/8d9d6ed5"
         }
     ]
 }
@@ -82,13 +82,13 @@ open xqa
 
 ## 4.2. psql
 ```
-psql -h 0.0.0.0 -p 5432 -U xqa
+psql -h 0.0.0.0 -p 5432 -U xqa # password: xqa
 
-select  distinct to_timestamp( (info->>'creationTime')::double precision / 1000) as creationTime,
+select  distinct to_timestamp( (info->>'creationtime')::double precision / 1000) as creationtime,
         info->>'source' as filename,
         info->>'digest' as digest,
         info->>'serviceId' as service
 from events
-where filename like '%/xml/DAQU-1931-0321.xml%'
-order by creationTime asc;
+where  info->>'source' like '%/xml/DAQU-1931-0321.xml%'
+order by creationtime asc;
 ```

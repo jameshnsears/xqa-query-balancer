@@ -62,7 +62,7 @@ public class SearchResource {
             List<SearchResult> results = new ArrayList<>();
             try {
                 results = handle.createQuery(sql).map((rs, ctx) -> new SearchResult(rs.getString("creationTime"),
-                        rs.getString("filename"), rs.getString("digest"), rs.getString("service"))).list();
+                        rs.getString("service"), rs.getString("filename"), rs.getString("digest"))).list();
                 LOGGER.info(String.format("results.size=%s", results.size()));
             } catch (UnableToExecuteStatementException exception) {
                 LOGGER.error(exception.getMessage());
