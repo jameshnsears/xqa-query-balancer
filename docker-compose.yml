@@ -5,6 +5,9 @@ services:
     build: .
     image: xqa-query-balancer
     container_name: xqa-query-balancer
+    ports:
+      - "9090:9090"
+      - "9091:9091"
     networks:
       - xqa
     depends_on:
@@ -60,15 +63,6 @@ services:
       - xqa
     depends_on:
       - xqa-message-broker
-
-  xqa-ingest:
-    image: jameshnsears/xqa-ingest
-    container_name: xqa-ingest
-    command: ["-message_broker_host", "xqa-message-broker"]
-    depends_on:
-      - xqa-message-broker
-    networks:
-      - xqa
 
 volumes:
   xqa-db:

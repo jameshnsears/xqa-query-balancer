@@ -16,18 +16,11 @@ Featuring:
 ### 2.2. CLI 
 * populate xqa-shard(s) and xqa-db using xqa-test-data:
 ```
-docker-compose up -d xqa-message-broker xqa-db xqa-db-amqp xqa-ingest-balancer
-
-docker-compose up -d --scale xqa-shard=2
-
-docker run -d --net="xqa-query-balancer_xqa" --name="xqa-ingest" -v $HOME/GIT_REPOS/xqa-test-data:/xml jameshnsears/xqa-ingest:latest -message_broker_host xqa-message-broker -path /xml
+./start.sh
 ```
 * wait until data in xqa:
     * docker logs xqa-ingest | grep "FINISHED - sent: 40/40"
-    * docker-compose logs xqa-shard | grep "size="
-```
-docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:9090 -p9091:9091 xqa-query-balancer 
-```
+    * docker-compose logs -f xqa-shard | grep "size="
 
 ### 2.2.1. Search
 ```
@@ -64,7 +57,9 @@ docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:
 * curl -X POST http://127.0.0.1:9091/tasks/gc
 
 ## 3. Teardown
-* docker-compose down -v
+```
+./stop.sh
+```
 
 ## 4. Useful storage commands
 ## 4.1. BaseX
