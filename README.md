@@ -68,9 +68,16 @@ docker run -d --net="xqa-query-balancer_xqa" --name="xqa-query-balancer" -p9090:
 
 ## 4. Useful storage commands
 ## 4.1. BaseX
-* basexclient -U admin -P admin
-* open xqa
-* delete /
+```
+docker ps -a
+CONTAINER ID        IMAGE                                     COMMAND                  CREATED             STATUS                      PORTS                                                                 NAMES
+ccb338c21e36        jameshnsears/xqa-shard:latest             "python3 xqa/shard.p…"   28 seconds ago      Up 25 seconds               0.0.0.0:32778->1984/tcp                                               xqa-query-balancer_xqa-shard_1_ab193b02ad89
+fc1566caa4e5        jameshnsears/xqa-shard:latest             "python3 xqa/shard.p…"   28 seconds ago      Up 25 seconds               0.0.0.0:32777->1984/tcp                                               xqa-query-balancer_xqa-shard_2_ec9ef595b8d0
+
+basexclient -U admin -P admin -p 32778
+list # nothing will show when using: -storage_mainmem
+open xqa
+```
 
 ## 4.2. psql
 ```
