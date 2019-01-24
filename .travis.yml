@@ -44,6 +44,8 @@ script:
   - mvn clean test
   - mvn checkstyle:check spotbugs:check pmd:pmd
 
+  - ./start.sh
+
   - export HEAP="-Xms1g -Xmx1g -XX:MaxMetaspaceSize=256m"
   - apache-jmeter-5.0/bin/jmeter -n -t jmeter-test-plan.jmx -l jmeter-test-plan.jtl
   - bash -c 'if [[ `grep "Test failed" jmeter-test-plan.jtl` ]]; then >&2 cat jmeter-test-plan.jtl; exit 1; fi'
@@ -52,3 +54,8 @@ after_success:
   - mvn jacoco:report coveralls:report
   - java -jar codacy-coverage-reporter-4.0.5-assembly.jar report -l Java -r target/site/jacoco/jacoco.xml
   - sonar-scanner
+
+after_failure:
+  - docker images
+  - docker ps -a
+  - docker logs xqa-query-balancer
