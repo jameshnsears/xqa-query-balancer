@@ -1,10 +1,13 @@
-version: '3'
+version: "3"
 
 services:
   xqa-query-balancer:
     build: .
     image: xqa-query-balancer
     container_name: xqa-query-balancer
+    environment:
+      - shardResponseTimeout=10000
+      - shardResponseSecondaryTimeout=2000
     ports:
       - "9090:9090"
       - "9091:9091"
@@ -27,7 +30,7 @@ services:
   xqa-db-amqp:
     image: jameshnsears/xqa-db-amqp
     container_name: xqa-db-amqp
-    command: ['-message_broker_host', 'xqa-message-broker', '-storage_host', 'xqa-db', '-storage_port', '5432']
+    command: ["-message_broker_host", "xqa-message-broker", "-storage_host", "xqa-db", "-storage_port", "5432"]
     networks:
       - xqa
     depends_on:
@@ -47,7 +50,7 @@ services:
 
   xqa-shard:
     image: jameshnsears/xqa-shard:latest
-    command: ["-message_broker_host", "xqa-message-broker"]
+    command: ["-message_broker_host", "xqa-message-broker", "-storage_mainmem"]
     ports:
       - 1984
     networks:

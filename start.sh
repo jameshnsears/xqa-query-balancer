@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
-docker-compose -f docker-compose.yml up -d xqa-message-broker xqa-db xqa-db-amqp xqa-ingest-balancer
+docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --publish=9999:8080 \
+  --detach=true \
+  --name=cadvisor \
+  google/cadvisor:latest
+
+docker-compose -f docker-compose.yml up -d xqa-message-broker xqa-db xqa-db-amqp xqa-ingest-balancer xqa-query-balancer
 
 docker-compose -f docker-compose.yml up -d --scale xqa-shard=2
 
