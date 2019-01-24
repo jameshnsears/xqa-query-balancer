@@ -22,7 +22,7 @@ Featuring:
     * docker logs xqa-ingest | grep "FINISHED - sent: 40/40"
     * docker-compose logs -f xqa-shard | grep "size="
 
-### 2.2.1. (optionally) override default parameters
+### 2.2.1. (optionally) Override default parameters
 * long running multiple XQuery's can cause the query-balancer threads to timeout and not return a result, the answer is to run the [JMeter](https://jmeter.apache.org/) script, review the Summary Report, and tune the timeout values appropriately in the docker-compose file.
 
 ### 2.2.2. Search
@@ -58,8 +58,19 @@ Featuring:
 * curl -X POST http://127.0.0.1:9091/tasks/log-level -H "Content-Type: application/json" -d "logger=ROOT&level=DEBUG"
 * curl -X POST http://127.0.0.1:9091/tasks/gc
 
-### 2.2.5. cadvisor
-* http://127.0.0.1:9999/containers/
+### 2.2.5. (optionally) Run cadvisor
+```
+docker run \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:ro \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --volume=/dev/disk/:/dev/disk:ro \
+  --publish=9999:8080 \
+  --detach=true \
+  --name=cadvisor \
+  google/cadvisor:latest
+```
 
 ## 3. Teardown
 ```
