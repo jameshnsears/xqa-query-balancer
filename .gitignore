@@ -1,6 +1,7 @@
 .checkstyle
 dependency-reduced-pom.xml
 .idea
+jmeter.log
 logs
 tags
 /target/
