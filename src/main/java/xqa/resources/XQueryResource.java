@@ -27,7 +27,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -54,8 +53,6 @@ public class XQueryResource {
     private String xqueryDestination;
     private int shardResponseTimeout;
     private int shardResponseSecondaryTimeout;
-    private DocumentBuilderFactory documentBuilderFactory;
-    private TransformerFactory factory;
     private Transformer transformer;
 
     public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration, final String serviceId)
@@ -77,12 +74,7 @@ public class XQueryResource {
             shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
             LOGGER.info(String.format("shardResponseSecondaryTimeout=%d", shardResponseSecondaryTimeout));
 
-            documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            documentBuilderFactory.setXIncludeAware(false);
-            documentBuilderFactory.setExpandEntityReferences(false);
-
-            factory = TransformerFactory.newInstance();
+            final TransformerFactory factory = TransformerFactory.newInstance();
             factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -114,7 +106,7 @@ public class XQueryResource {
         return new XQueryResponse(materialiseShardXQueryResponses(shardXQueryResponses)); // json out
     }
 
-    public synchronized void sendAuditEvent(final QueryBalancerEvent.State eventState,
+    public void sendAuditEvent(final QueryBalancerEvent.State eventState,
                                             final String correlationId,
                                             final String xquery)
             throws JMSException, JsonProcessingException, MessageBroker.MessageBrokerException {
@@ -123,23 +115,27 @@ public class XQueryResource {
 
         final ObjectMapper mapper = new ObjectMapper();
 
-        final Message message = MessageMaker.createMessage(messageBroker.getSession(),
-                messageBroker.getSession().createQueue(auditDestination), UUID.randomUUID().toString(),
-                mapper.writeValueAsString(queryBalancerEvent));
+        synchronized (this) {
+            final Message message = MessageMaker.createMessage(messageBroker.getSession(),
+                    messageBroker.getSession().createQueue(auditDestination), UUID.randomUUID().toString(),
+                    mapper.writeValueAsString(queryBalancerEvent));
 
-        messageBroker.sendMessage(message);
+            messageBroker.sendMessage(message);
+        }
     }
 
-    public synchronized void sendXQueryToShards(final @NotNull @Valid XQueryRequest xquery,
+    public void sendXQueryToShards(final @NotNull @Valid XQueryRequest xquery,
                                                 final String correlationId)
             throws JMSException, MessageBroker.MessageBrokerException {
-        shardReplyToQueue = messageBroker.createTemporaryQueue();
+        synchronized (this) {
+            shardReplyToQueue = messageBroker.createTemporaryQueue();
 
-        final Message message = MessageMaker.createMessage(messageBroker.getSession(),
-                messageBroker.getSession().createTopic(xqueryDestination), shardReplyToQueue, correlationId,
-                xquery.getXQueryRequest());
+            final Message message = MessageMaker.createMessage(messageBroker.getSession(),
+                    messageBroker.getSession().createTopic(xqueryDestination), shardReplyToQueue, correlationId,
+                    xquery.getXQueryRequest());
 
-        messageBroker.sendMessage(message);
+            messageBroker.sendMessage(message);
+        }
     }
 
     public synchronized List<Message> collectShardXQueryResponses() throws JMSException {
@@ -149,7 +145,7 @@ public class XQueryResource {
 
     private String materialiseShardXQueryResponses(final List<Message> shardXQueryResponses)
             throws JMSException, TransformerException {
-        final StringBuilder response = new StringBuilder();
+        final StringBuilder response = new StringBuilder(36);
         response.append("<xqueryResponse>\n");
 
         for (final Message message : shardXQueryResponses) {
@@ -164,9 +160,9 @@ public class XQueryResource {
     private String prettyPrintXml(final String xml)
             throws TransformerException {
         try {
-            StreamSource streamSource = new StreamSource(new StringReader(xml.replace("\n", "")));
-            StringWriter stringWriter = new StringWriter();
-            StreamResult streamResult = new StreamResult(stringWriter);
+            final StreamSource streamSource = new StreamSource(new StringReader(xml.replace("\n", "")));
+            final StringWriter stringWriter = new StringWriter();
+            final StreamResult streamResult = new StreamResult(stringWriter);
             synchronized (this) {
                 transformer.transform(streamSource, streamResult);
             }
