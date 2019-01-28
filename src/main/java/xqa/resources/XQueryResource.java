@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 import xqa.api.xquery.XQueryRequest;
 import xqa.api.xquery.XQueryResponse;
 import xqa.commons.qpid.jms.MessageBroker;
@@ -42,7 +41,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.UUID;
-import java.util.Vector;
 
 @Path("/xquery")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -80,8 +78,7 @@ public class XQueryResource {
             LOGGER.info(String.format("shardResponseSecondaryTimeout=%d", shardResponseSecondaryTimeout));
 
             documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilderFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             documentBuilderFactory.setXIncludeAware(false);
             documentBuilderFactory.setExpandEntityReferences(false);
 
@@ -97,12 +94,12 @@ public class XQueryResource {
     @POST
     @Timed
     public XQueryResponse xquery(final @NotNull @Valid XQueryRequest xquery)
-            throws JMSException, IOException, MessageBrokerException, TransformerException, SAXException { // json in
+            throws JMSException, IOException, MessageBrokerException, TransformerException { // json in
         if (xquery.getXQueryRequest().isEmpty()) {
             throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
         }
 
-        List<Message> shardXQueryResponses = new Vector<>();
+        List<Message> shardXQueryResponses;
 
         final String correlationId = UUID.randomUUID().toString();
 
