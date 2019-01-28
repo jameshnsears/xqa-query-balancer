@@ -34,7 +34,7 @@ import xqa.integration.fixtures.DatabaseFixture;
 public class SearchTest extends DatabaseFixture {
     private static final ObjectMapper OBJECTMAPPER = Jackson.newObjectMapper();
     private final Client client = ClientBuilder.newClient();
-    private final static String ROOT_URL = "http://127.0.0.1:" + APPLICATION.getLocalPort();
+    private final static String ROOT_URL = "http://127.0.0.1:";
 
     @BeforeAll
     public static void startContainers(final ConfigurationAccessor configurationAccessor) throws IOException {
@@ -60,7 +60,7 @@ public class SearchTest extends DatabaseFixture {
         storageEmpty();
         storagePopulate();
 
-        final String searchUrl = ROOT_URL + "/search";
+        final String searchUrl = ROOT_URL + APPLICATION.getLocalPort() + "/search";
 
         final SearchResponse searchWithoutTrailingSlash = client
                 .target(searchUrl)
@@ -82,7 +82,7 @@ public class SearchTest extends DatabaseFixture {
     public void searchFailure() throws SQLException, ClassNotFoundException {
         storageEmpty();
 
-        Assertions.assertEquals(204, client.target(ROOT_URL + "/search")
+        Assertions.assertEquals(204, client.target(ROOT_URL + APPLICATION.getLocalPort() + "/search")
                 .request().get().getStatus());
     }
 
@@ -92,12 +92,12 @@ public class SearchTest extends DatabaseFixture {
         storagePopulate();
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> client.target(ROOT_URL + "/search/filename/")
+                .isThrownBy(() -> client.target(ROOT_URL + APPLICATION.getLocalPort() + "/search/filename/")
                         .request().get(SearchResponse.class))
                 .withMessage("HTTP 404 Not Found");
 
         final SearchResponse searchResponse = client
-                .target(ROOT_URL + "/search/filename//xml/DAQU-1931-0321.xml")
+                .target(ROOT_URL + APPLICATION.getLocalPort() + "/search/filename//xml/DAQU-1931-0321.xml")
                 .request().get(SearchResponse.class);
 
         Assertions.assertEquals(1, searchResponse.getSearchResponse().size());
@@ -107,7 +107,7 @@ public class SearchTest extends DatabaseFixture {
 
         assertThat(OBJECTMAPPER.writeValueAsString(searchResponse.getSearchResponse())).isEqualTo(expected);
 
-        final WebTarget target = client.target(ROOT_URL + "/search/filename/blah");
+        final WebTarget target = client.target(ROOT_URL + APPLICATION.getLocalPort() + "/search/filename/blah");
         final Response response = target.request().get();
 
         Assertions.assertEquals(204, response.getStatus());
@@ -119,7 +119,7 @@ public class SearchTest extends DatabaseFixture {
         storagePopulate();
 
         final SearchResponse searchResponse = client
-                .target(ROOT_URL + "/search/digest/d6f04c988162284ff57c06e69")
+                .target(ROOT_URL + APPLICATION.getLocalPort() + "/search/digest/d6f04c988162284ff57c06e69")
                 .request().get(SearchResponse.class);
 
         Assertions.assertEquals(3, searchResponse.getSearchResponse().size());
@@ -136,7 +136,7 @@ public class SearchTest extends DatabaseFixture {
         storagePopulate();
 
         final SearchResponse searchResponse = client
-                .target(ROOT_URL + "/search/service/ingest/d6d26946").request()
+                .target(ROOT_URL + APPLICATION.getLocalPort() + "/search/service/ingest/d6d26946").request()
                 .get(SearchResponse.class);
 
         Assertions.assertNotNull(searchResponse);
