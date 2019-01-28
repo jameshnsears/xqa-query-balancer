@@ -1,7 +1,9 @@
 package xqa;
 
+import java.util.EnumSet;
 import java.util.UUID;
 
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.jdbi.v3.core.Jdbi;
 
 import io.dropwizard.Application;
@@ -13,6 +15,9 @@ import io.dropwizard.setup.Environment;
 import xqa.health.QueryBalancerHealthCheck;
 import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
+
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
     private final String serviceId;
@@ -39,6 +44,13 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
 
     @Override
     public void run(final XqaQueryBalancerConfiguration configuration, final Environment environment) throws Exception {
+        final FilterRegistration.Dynamic cors =
+                environment.servlets().addFilter("CORS", CrossOriginFilter.class);
+        cors.setInitParameter("allowedOrigins", "*");
+        cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
+        cors.setInitParameter("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+        cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+
         environment.healthChecks().register("QueryBalancerHealthCheck", new QueryBalancerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();
