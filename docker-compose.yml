@@ -18,7 +18,7 @@ services:
       - xqa-message-broker
 
   xqa-db:
-    image: jameshnsears/xqa-db:latest
+    image: jameshnsears/xqa-db:latest:latest
     container_name: xqa-db
     volumes:
       - "xqa-db:/var/lib/postgresql"
@@ -28,7 +28,7 @@ services:
       - xqa
 
   xqa-db-amqp:
-    image: jameshnsears/xqa-db-amqp
+    image: jameshnsears/xqa-db-amqp:latest
     container_name: xqa-db-amqp
     command: ["-message_broker_host", "xqa-message-broker", "-storage_host", "xqa-db", "-storage_port", "5432"]
     networks:
