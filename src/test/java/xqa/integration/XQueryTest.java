@@ -76,7 +76,7 @@ public class XQueryTest extends ShardFixture {
     public void xquerySize() throws Exception {
         setupStorage(APPLICATION.getConfiguration());
         final XQueryResponse xqueryResponse = client.target("http://0.0.0.0:" + APPLICATION.getLocalPort() + "/xquery")
-                .request(MediaType.APPLICATION_JSON_TYPE).post(Entity.json(new XQueryRequest("count(/)")))
+                .request(MediaType.APPLICATION_JSON).post(Entity.json(new XQueryRequest("count(/)")))
                 .readEntity(XQueryResponse.class);
 
         LOGGER.info(xqueryResponse.getXqueryResponse());
@@ -105,10 +105,10 @@ public class XQueryTest extends ShardFixture {
     @Test
     public void xqueryContent() throws IOException, SAXException, XPathExpressionException {
         final XQueryResponse xqueryResponse = client.target("http://0.0.0.0:" + APPLICATION.getLocalPort() + "/xquery")
-                .request(MediaType.APPLICATION_JSON_TYPE)
+                .request(MediaType.APPLICATION_JSON)
                 .post(Entity.json(new XQueryRequest("/chapter/metadataInfo/PSMID"))).readEntity(XQueryResponse.class);
 
-        LOGGER.info(xqueryResponse.getXqueryResponse());
+        LOGGER.info(xqueryResponse.getXqueryResponse().toString());
 
         final Document xmlDocument = documentBuilder
                 .parse(new InputSource(new StringReader(xqueryResponse.getXqueryResponse())));

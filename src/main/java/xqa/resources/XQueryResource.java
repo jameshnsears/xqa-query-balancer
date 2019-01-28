@@ -1,8 +1,19 @@
 package xqa.resources;
 
-import java.util.List;
-import java.util.UUID;
-import java.util.Vector;
+import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import xqa.api.xquery.XQueryRequest;
+import xqa.api.xquery.XQueryResponse;
+import xqa.commons.qpid.jms.MessageBroker;
+import xqa.commons.qpid.jms.MessageBroker.MessageBrokerException;
+import xqa.commons.qpid.jms.MessageMaker;
+import xqa.resources.messagebroker.MessageBrokerConfiguration;
+import xqa.resources.messagebroker.QueryBalancerEvent;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -16,22 +27,20 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import xqa.api.xquery.XQueryRequest;
-import xqa.api.xquery.XQueryResponse;
-import xqa.commons.qpid.jms.MessageBroker;
-import xqa.commons.qpid.jms.MessageBroker.MessageBrokerException;
-import xqa.commons.qpid.jms.MessageMaker;
-import xqa.resources.messagebroker.MessageBrokerConfiguration;
-import xqa.resources.messagebroker.QueryBalancerEvent;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.UUID;
+import java.util.Vector;
 
 @Path("/xquery")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,9 +54,13 @@ public class XQueryResource {
     private String xqueryDestination;
     private int shardResponseTimeout;
     private int shardResponseSecondaryTimeout;
+    private DocumentBuilderFactory factory;
+    private Transformer transformer;
 
     public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration, final String serviceId)
-            throws InterruptedException, MessageBroker.MessageBrokerException {
+            throws InterruptedException,
+            MessageBroker.MessageBrokerException,
+            TransformerConfigurationException {
         synchronized (this) {
             this.serviceId = serviceId;
 
@@ -62,13 +75,20 @@ public class XQueryResource {
             LOGGER.info(String.format("shardResponseTimeout=%d", shardResponseTimeout));
             shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
             LOGGER.info(String.format("shardResponseSecondaryTimeout=%d", shardResponseSecondaryTimeout));
+
+            factory = DocumentBuilderFactory.newInstance();
+
+            transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
         }
     }
 
     @POST
     @Timed
     public XQueryResponse xquery(final @NotNull @Valid XQueryRequest xquery)
-            throws JMSException, JsonProcessingException, MessageBrokerException { // json in
+            throws JMSException, IOException, MessageBrokerException, TransformerException, SAXException { // json in
         if (xquery.getXQueryRequest().isEmpty()) {
             throw new WebApplicationException("no xquery", Response.Status.BAD_REQUEST);
         }
@@ -121,11 +141,33 @@ public class XQueryResource {
                 shardResponseSecondaryTimeout);
     }
 
-    private String materialiseShardXQueryResponses(final List<Message> shardXQueryResponses) throws JMSException {
-        final StringBuilder response = new StringBuilder("<xqueryResponse>\n");
+    private String materialiseShardXQueryResponses(final List<Message> shardXQueryResponses)
+            throws JMSException, TransformerException {
+        final StringBuilder response = new StringBuilder();
+        response.append("<xqueryResponse>\n");
+
         for (final Message message : shardXQueryResponses) {
             response.append(MessageMaker.getBody(message));
+            response.append('\n');
         }
-        return response.append("</xqueryResponse>").toString();
+        response.append("</xqueryResponse>");
+
+        return prettyPrintXml(response.toString());
+    }
+
+    private String prettyPrintXml(final String xml)
+            throws TransformerException {
+        try {
+            StreamSource streamSource = new StreamSource(new StringReader(xml.replace("\n", "")));
+            StringWriter stringWriter = new StringWriter();
+            StreamResult streamResult = new StreamResult(stringWriter);
+            synchronized (this) {
+                transformer.transform(streamSource, streamResult);
+            }
+            return stringWriter.toString();
+        } catch (TransformerException exception) {
+            LOGGER.error(exception.getMessage());
+            throw exception;
+        }
     }
 }
