@@ -27,7 +27,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -54,13 +56,14 @@ public class XQueryResource {
     private String xqueryDestination;
     private int shardResponseTimeout;
     private int shardResponseSecondaryTimeout;
-    private DocumentBuilderFactory factory;
+    private DocumentBuilderFactory documentBuilderFactory;
+    private TransformerFactory factory;
     private Transformer transformer;
 
     public XQueryResource(final MessageBrokerConfiguration messageBrokerConfiguration, final String serviceId)
             throws InterruptedException,
             MessageBroker.MessageBrokerException,
-            TransformerConfigurationException {
+            TransformerConfigurationException, ParserConfigurationException {
         synchronized (this) {
             this.serviceId = serviceId;
 
@@ -76,9 +79,15 @@ public class XQueryResource {
             shardResponseSecondaryTimeout = messageBrokerConfiguration.getShardResponseSecondaryTimeout();
             LOGGER.info(String.format("shardResponseSecondaryTimeout=%d", shardResponseSecondaryTimeout));
 
-            factory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            documentBuilderFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            documentBuilderFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            documentBuilderFactory.setXIncludeAware(false);
+            documentBuilderFactory.setExpandEntityReferences(false);
 
-            transformer = TransformerFactory.newInstance().newTransformer();
+            factory = TransformerFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
