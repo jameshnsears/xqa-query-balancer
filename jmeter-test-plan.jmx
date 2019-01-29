@@ -204,8 +204,11 @@
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="2107316291">{&quot;xqueryResponse&quot;:&quot;&lt;xqueryResponse&gt;</stringProp>
-              <stringProp name="366998722">&lt;/shard&gt;&lt;/xqueryResponse&gt;&quot;}</stringProp>
-              <stringProp name="-588140960">cho_chrx_2001_korppoo_001_0000</stringProp>
+              <stringProp name="357703468">cho_chrx_2001_korppoo_001_0000&lt;/PSMID&gt;</stringProp>
+              <stringProp name="-703761744">No Results From XQuery&lt;/shard&gt;</stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
+              <stringProp name="0"></stringProp>
               <stringProp name="0"></stringProp>
               <stringProp name="0"></stringProp>
               <stringProp name="0"></stringProp>

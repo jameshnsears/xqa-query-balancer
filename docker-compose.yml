@@ -18,7 +18,7 @@ services:
       - xqa-message-broker
 
   xqa-db:
-    image: jameshnsears/xqa-db:latest:latest
+    image: jameshnsears/xqa-db:latest
     container_name: xqa-db
     volumes:
       - "xqa-db:/var/lib/postgresql"
