@@ -10,7 +10,7 @@ database:
   driverClass: org.postgresql.Driver
   user: xqa
   password: xqa
-  url: jdbc:postgresql://0.0.0.0:5432/xqa
+  url: ${databaseUrl:- jdbc:postgresql://0.0.0.0:5432/xqa}
   properties:
     charSet: UTF-8
   maxWaitForConnection: 5s
@@ -32,7 +32,7 @@ logging:
     - type: console
 
 messageBroker:
-  host: 0.0.0.0
+  host: ${messageBrokerHost:- 0.0.0.0}
   port: 5672
   userName: admin
   password: admin

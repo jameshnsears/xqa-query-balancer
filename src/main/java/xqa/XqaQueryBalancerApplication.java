@@ -12,6 +12,8 @@ import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import xqa.health.QueryBalancerHealthCheck;
 import xqa.resources.SearchResource;
 import xqa.resources.XQueryResource;
@@ -20,6 +22,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 
 public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerConfiguration> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(XqaQueryBalancerApplication.class);
     private final String serviceId;
 
     public XqaQueryBalancerApplication() {
@@ -54,6 +57,8 @@ public class XqaQueryBalancerApplication extends Application<XqaQueryBalancerCon
         environment.healthChecks().register("QueryBalancerHealthCheck", new QueryBalancerHealthCheck());
 
         final JdbiFactory factory = new JdbiFactory();
+        LOGGER.info(String.format("databaseUrl=%s", configuration.getDataSourceFactory().getUrl()));
+
         final Jdbi jdbi = factory.build(environment, configuration.getDataSourceFactory(), "postgresql");
 
         environment.jersey().register(new SearchResource(jdbi));

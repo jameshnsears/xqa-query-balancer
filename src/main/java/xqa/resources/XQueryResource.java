@@ -62,6 +62,8 @@ public class XQueryResource {
         synchronized (this) {
             this.serviceId = serviceId;
 
+            LOGGER.info(String.format("messageBrokerHost=%s", messageBrokerConfiguration.getHost()));
+
             messageBroker = new MessageBroker(messageBrokerConfiguration.getHost(), messageBrokerConfiguration.getPort(),
                     messageBrokerConfiguration.getUserName(), messageBrokerConfiguration.getPassword(),
                     messageBrokerConfiguration.getRetryAttempts());
